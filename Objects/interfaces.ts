@@ -137,6 +137,10 @@ export interface StickerInterface {
     type?: stickerTypes | undefined;
     width?: number | undefined;
     height?: number | undefined;
+    is_animated?: boolean | undefined;
+    is_video?: boolean | undefined;
+    thumbnail?: PhotoSizeInterface | undefined;
+    set_name?: string | undefined;
 }
 
 export interface StickerSetInterface {
@@ -190,13 +194,12 @@ export interface Invoice {
 }
 
 export interface CallbackQuery {
-    clicked_from_chat?: number | undefined;
     id?: number | undefined;
-    inline_id?: number | undefined;
     from?: User | undefined;
     data?: string | undefined;
     inline_message_id?: number | undefined;
     message?: MessageForm | undefined;
+    chat_instance?: number | undefined;
 }
 
 export interface MessageForm {
@@ -225,7 +228,6 @@ export interface MessageForm {
     invoice?: Invoice | undefined;
     successful_payment?: Map<string, string> | undefined;
     reply_markup?: InlineKeyboard | ReplyKeyboard | undefined;
-    callback_query?: CallbackQuery | undefined;
 }
 
 type keyboardTypes = "inline_keyboard" | "keyboard";
@@ -238,6 +240,11 @@ export interface SendMessageOptions {
 
 export interface ConstructorOptions {
     polling_interval: number | undefined;
+}
+
+export interface ForwardOptions {
+    message_id?: number | undefined;
+    to_chat?: number | undefined;
 }
 
 module.exports = { MaskText };
