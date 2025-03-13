@@ -1,6 +1,6 @@
-type chatTypes = 'private' | 'group' | 'channel';
-type stickerTypes = 'regular' | 'mask';
-type MessageTypes = 
+export type chatTypes = 'private' | 'group' | 'channel';
+export type stickerTypes = 'regular' | 'mask';
+export type MessageTypes = 
   | 'message'
   | 'photo'
   | 'video'
@@ -9,7 +9,7 @@ type MessageTypes =
   | 'audio'
   | 'voice';
 
-class MaskText{
+export class MaskText{
     text: string;
 
     constructor(text: string){
@@ -34,114 +34,116 @@ class MaskText{
 
 }
 
-interface User {
-    id: number | undefined;
-    is_bot: boolean | undefined;
-    first_name: string | undefined;
-    last_name: string | undefined;
-    username: string | undefined;
-    language_code: string | undefined;
+export interface User {
+    id?: number | undefined;
+    is_bot?: boolean | undefined;
+    first_name?: string | undefined;
+    last_name?: string | undefined;
+    username?: string | undefined;
+    language_code?: string | undefined;
 }
 
-interface ChatPhoto {
-    small_file_id: string | undefined;
-    small_file_unique_id: string | undefined;
-    big_file_id: string | undefined;
-    big_file_unique_id: string | undefined;
+export interface ChatPhoto {
+    small_file_id?: string | undefined;
+    small_file_unique_id?: string | undefined;
+    big_file_id?: string | undefined;
+    big_file_unique_id?: string | undefined;
 }
 
-interface PhotoSize {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
-    width: number | undefined;
-    height: number | undefined;
-    size: number | undefined;
+export interface PhotoSizeInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
+    size?: number | undefined;
+    file_size?: number | undefined;
 }
 
-interface AnimationInterface {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
-    width: number | undefined;
-    height: number | undefined;
-    duration: number | undefined;
-    thumbnail: PhotoSize;
-    file_name: string | undefined;
-    mime_type: string | undefined;
-    file_size: number | undefined;
+export interface AnimationInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
+    duration?: number | undefined;
+    thumbnail?: PhotoSizeInterface;
+    file_name?: string | undefined;
+    mime_type?: string | undefined;
+    file_size?: number | undefined;
 }
 
-interface AudioInterface {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
-    duration: number | undefined;
-    title: string | undefined;
-    first_name: string | undefined;
-    mime_type: string | undefined;
-    file_size: number | undefined;
+export interface AudioInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    duration?: number | undefined;
+    mime_type?: string | undefined;
+    file_size?: number | undefined;
 }
 
-interface DocumentLikeInterface {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
-    thumbnail: PhotoSize;
-    file_name: string | undefined;
-    mime_type: string | undefined;
-    file_size: number | undefined;
+export interface DocumentLikeInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    thumbnail?: PhotoSizeInterface;
+    file_name?: string | undefined;
+    mime_type?: string | undefined;
+    file_size?: number | undefined;
 }
 
-interface VideoInterface {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
-    width: number | undefined;
-    height: number | undefined;
-    duration: number | undefined;
-    file_name: string | undefined;
-    mime_type: string | undefined;
-    file_size: number | undefined;
+export interface VideoInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
+    duration?: number | undefined;
+    file_name?: string | undefined;
+    mime_type?: string | undefined;
+    file_size?: number | undefined;
 }
 
-interface VoiceInterface {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
+export interface VoiceInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    duration?: number | undefined;
+    mime_type?: string | undefined;
+    file_size?: number | undefined;
 }
 
-interface ContactInterface {
-    phone_number: string | undefined;
-    first_name: string | undefined;
-    last_name: string | undefined;
-    user_id: number | undefined;
+export interface ContactInterface {
+    phone_number?: string | undefined;
+    first_name?: string | undefined;
+    last_name?: string | undefined;
+    user_id?: number | undefined;
 }
 
-interface ContactArray {
-    contacts: Array<ContactInterface> | [] | undefined;
+export interface ContactArray {
+    contacts?: Array<ContactInterface> | [] | undefined;
 }
 
-interface LocationInterface {
-    longitude: number | undefined;
-    latitude: number | undefined;
+export interface LocationInterface {
+    longitude?: number | undefined;
+    latitude?: number | undefined;
 }
 
-interface FileInterface {
-    id: string | undefined;
-    unique_id: string | undefined;
-    size: number | undefined;
-    path: string | undefined;
+export interface FileInterface {
+    id?: string | undefined;
+    unique_id?: string | undefined;
+    size?: number | undefined;
+    path?: string | undefined;
 }
 
-interface StickerInterface {
-    file_id: string | undefined;
-    file_unique_id: string | undefined;
-    file_size: number | undefined;
-    type: stickerTypes | undefined;
-    width: number | undefined;
-    height: number | undefined;
+export interface StickerInterface {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    file_size?: number | undefined;
+    type?: stickerTypes | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
 }
 
-interface StickerSetInterface {
-    name: string | undefined;
-    title: string | undefined;
-    stickers: Array<StickerInterface> | [] | undefined;
-    thumbnail: PhotoSize | undefined;
+export interface StickerSetInterface {
+    name?: string | undefined;
+    title?: string | undefined;
+    stickers?: Array<StickerInterface> | [] | undefined;
+    thumbnail?: PhotoSizeInterface | undefined;
 }
 
 interface InlineKeyboardNotSuggest {
@@ -151,7 +153,7 @@ interface InlineKeyboardNotSuggest {
 }
 
 type inline_buttons = InlineKeyboardNotSuggest[];
-type InlineKeyboard = inline_buttons[];
+export type InlineKeyboard = inline_buttons[];
 
 interface ReplyKeyboardNotSuggest {
     text: string;
@@ -162,44 +164,46 @@ interface ReplyKeyboardNotSuggest {
 }
 
 type reply_buttons = ReplyKeyboardNotSuggest[];
-type ReplyKeyboard = reply_buttons[];
+export type ReplyKeyboard = reply_buttons[];
 
-interface Chat {
-    id: number | undefined;
-    type: chatTypes | undefined;
-    title: string | undefined;
-    username: string | undefined;
-    photo: ChatPhoto | undefined;
-    first_name: string | undefined;
-    last_name: string | undefined;
-    invite_link: string | undefined;
+export interface Chat {
+    id?: number | undefined;
+    type?: chatTypes | undefined;
+    title?: string | undefined;
+    username?: string | undefined;
+    photo?: ChatPhoto | undefined;
+    first_name?: string | undefined;
+    last_name?: string | undefined;
+    invite_link?: string | undefined;
 }
 
-interface Invoice {
-    chat_id: number | undefined;
-    title: string | undefined;
-    description: string | undefined;
-    payload: string | undefined;
-    provider_token: string | undefined;
-    photo_url: string | undefined;
-    reply_to_message_id: number | undefined;
-    reply_markup: InlineKeyboard | ReplyKeyboard | undefined;
-    prices: Array<Map<string, string>>;
+export interface Invoice {
+    chat_id?: number | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    payload?: string | undefined;
+    provider_token?: string | undefined;
+    photo_url?: string | undefined;
+    reply_to_message_id?: number | undefined;
+    reply_markup?: InlineKeyboard | ReplyKeyboard | undefined;
+    prices?: Array<Map<string, string>>;
 }
 
-interface CallbackQuery {
-    clicked_from_chat: number | undefined;
-    id: number | undefined;
-    inline_id: number | undefined;
-    from: User | undefined;
-    data: string | undefined;
+export interface CallbackQuery {
+    clicked_from_chat?: number | undefined;
+    id?: number | undefined;
+    inline_id?: number | undefined;
+    from?: User | undefined;
+    data?: string | undefined;
+    inline_message_id?: number | undefined;
+    message?: MessageForm | undefined;
 }
 
-interface MessageForm {
-    id: number | undefined;
-    from: User | undefined;
-    date: number | undefined;
-    chat: Chat | undefined;
+export interface MessageForm {
+    id?: number | undefined;
+    from?: User | undefined;
+    date?: number | undefined;
+    chat?: Chat | undefined;
     forward_from?: User | undefined;
     forward_from_chat?: Chat | undefined;
     forward_from_message_id?: number | undefined;
@@ -211,7 +215,7 @@ interface MessageForm {
     voice?: VoiceInterface | undefined;
     document?: DocumentLikeInterface | undefined;
     video?: VideoInterface | undefined;
-    photo?: Array<PhotoSize> | undefined;
+    photo?: Array<PhotoSizeInterface> | Array<any> | undefined;
     sticker?: StickerInterface | undefined;
     caption?: string | undefined;
     contact?: ContactInterface | undefined;
@@ -220,6 +224,20 @@ interface MessageForm {
     left_chat_member?: User | undefined;
     invoice?: Invoice | undefined;
     successful_payment?: Map<string, string> | undefined;
-    reply_markup?: InlineKeyboard | undefined;
+    reply_markup?: InlineKeyboard | ReplyKeyboard | undefined;
     callback_query?: CallbackQuery | undefined;
 }
+
+type keyboardTypes = "inline_keyboard" | "keyboard";
+
+export interface SendMessageOptions {
+    reply_to_message_id?: number | undefined;
+    reply_markup?: InlineKeyboard | ReplyKeyboard | undefined;
+    keyboard_mode?: keyboardTypes | undefined;
+}
+
+export interface ConstructorOptions {
+    polling_interval: number | undefined;
+}
+
+module.exports = { MaskText };
