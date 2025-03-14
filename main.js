@@ -1,4 +1,5 @@
 "use strict";
+// write callback of SendMessage carefully ( handle photo )
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -66,13 +67,15 @@ var connection_1 = require("./Network/connection");
 var BaleBot = /** @class */ (function (_super) {
     __extends(BaleBot, _super);
     function BaleBot(BotToken, options) {
-        if (options === void 0) { options = { polling_interval: 999 }; }
+        if (options === void 0) { options = { polling_interval: 999, polling: false }; }
         var _a;
         var _this = _super.call(this) || this;
         _this.bot_token = BotToken;
         _this.request = new connection_1.Connection(_this.bot_token);
         _this.time = 999;
-        _this.poll((_a = options.polling_interval) !== null && _a !== void 0 ? _a : 999);
+        if (options.polling) {
+            _this.poll((_a = options.polling_interval) !== null && _a !== void 0 ? _a : 999);
+        }
         return _this;
     }
     BaleBot.prototype.emit = function (event) {
@@ -464,17 +467,21 @@ var BaleBot = /** @class */ (function (_super) {
                                     })];
                             case 1:
                                 _a.sent();
-                                return [3 /*break*/, 4];
+                                _a.label = 2;
                             case 2:
                                 if (!evs.includes("callback_query")) return [3 /*break*/, 4];
                                 return [4 /*yield*/, this.request.makeConnection("getUpdates", {}, function (res) {
                                         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21;
+                                        console.log(res);
                                         if (res.ok) {
                                             var indexes = (_a = res['result']) !== null && _a !== void 0 ? _a : [{}];
                                             var last_index = indexes.length - 1;
+                                            console.log(indexes[last_index]);
                                             if (Object.keys(indexes[last_index]).includes("callback_query") === true) {
                                                 var last_update = indexes[last_index]['callback_query'];
+                                                console.log(last_update);
                                                 if (!(clids.includes(last_update['id']))) {
+                                                    console.log(last_update['id']);
                                                     var f = {
                                                         id: (_b = last_update['from']) === null || _b === void 0 ? void 0 : _b['id'],
                                                         is_bot: (_c = last_update['from']) === null || _c === void 0 ? void 0 : _c['is_bot'],
@@ -541,7 +548,40 @@ var BaleBot = /** @class */ (function (_super) {
     return BaleBot;
 }(events_1.EventEmitter));
 exports.BaleBot = BaleBot;
-// const bot = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling_interval: 999 });
+// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling_interval: 999, polling: true });
+// b.on("message", (msg) => {
+//     if (msg.text.startsWith("/start")){
+//         b.sendMessage(
+//             msg.chat.id,
+//             "Hi",
+//             {
+//                 reply_to_message_id: msg.id,
+//                 keyboard_mode: "inline_keyboard",
+//                 reply_markup: [
+//                     [
+//                         {
+//                             text: "close message",
+//                             callback_data: "close"
+//                         }
+//                     ]
+//                 ]
+//             }
+//         )
+//     }
+// })
+// b.on("callback_query", (call) => {
+//     console.log(call)
+//     if (call.data === "close"){
+//         b.sendMessage(
+//             call.chat_instance,
+//             "Message will delete",
+//             {
+//                 reply_to_message_id: call.message.id
+//             },
+//             (a) => {console.log(a)}
+//         )
+//     }
+// })
 // bot.forwardMessage(
 //     554324725,
 //     {
