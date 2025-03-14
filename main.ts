@@ -390,16 +390,12 @@ export class BaleBot extends EventEmitter{
                 })
             } if (evs.includes("callback_query")){
                 await this.request.makeConnection("getUpdates", {}, (res) => {
-                    console.log(res)
                     if (res.ok){
                         let indexes =  res['result'] ?? [{}];
                         let last_index = indexes.length - 1;
-                        console.log(indexes[last_index])
                         if (Object.keys(indexes[last_index]).includes("callback_query") === true){
                             const last_update = indexes[last_index]['callback_query'];
-                            console.log(last_update)
                             if (!(clids.includes(last_update['id']))){
-                                console.log(last_update['id'])
                                 const f: User = {
                                     id: last_update['from']?.['id'],
                                     is_bot: last_update['from']?.['is_bot'],
