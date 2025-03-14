@@ -1,3 +1,5 @@
+// write callback of SendMessage carefully ( handle photo )
+
 import { EventEmitter } from 'events';
 import { Connection } from "./Network/connection";
 import {
@@ -27,12 +29,14 @@ export class BaleBot extends EventEmitter{
     request: Connection;
     private time: number;
 
-    constructor(BotToken: string, options: ConstructorOptions = { polling_interval: 999 }){
+    constructor(BotToken: string, options: ConstructorOptions = { polling_interval: 999, polling: false }){
         super();
         this.bot_token = BotToken;
         this.request = new Connection(this.bot_token);
         this.time = 999;
-        this.poll(options.polling_interval ?? 999);
+        if (options.polling){
+            this.poll(options.polling_interval ?? 999);
+        }
     }
 
     emit<K extends keyof events>(event: K, ...args: Parameters<events[K]>): boolean {

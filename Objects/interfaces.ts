@@ -240,6 +240,7 @@ export interface SendMessageOptions {
 
 export interface ConstructorOptions {
     polling_interval: number | undefined;
+    polling: boolean | undefined;
 }
 
 export interface ForwardOptions {
