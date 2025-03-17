@@ -1,16 +1,18 @@
 // write callback of SendMessage carefully ( handle photo )
 
+import { existsSync, createReadStream, createWriteStream, readSync, readFileSync, exists } from 'fs';
+import { Readable } from 'stream';
+import { basename } from 'path';
 import { EventEmitter } from 'events';
 import { Connection } from "./Network/connection";
 import {
-    chatTypes, stickerTypes, MessageTypes, InlineKeyboard, ReplyKeyboard,
+    chatTypes, stickerTypes, MessageTypes, InlineKeyboard, ReplyKeyboard, medias,
     MaskText,
-    User, Chat, ChatPhoto, PhotoSizeInterface,
-    SendMessageOptions, ConstructorOptions,
+    User, Chat, ChatPhoto, PhotoSizeInterface, PhotoCallback,
+    SendMessageOptions, ConstructorOptions, ForwardOptions, MediaOptions, MediaUpload,
     AnimationInterface, AudioInterface, DocumentLikeInterface, VideoInterface,
     VoiceInterface, ContactInterface, ContactArray, LocationInterface, FileInterface,
     StickerInterface, StickerSetInterface, Invoice, CallbackQuery, MessageForm,
-    ForwardOptions
 } from "./Objects/interfaces";
 
 interface events {
@@ -24,15 +26,19 @@ interface events {
     document: (message: MessageForm) => void
 }
 
-export class BaleBot extends EventEmitter{
+export class BaleBot extends EventEmitter {
     bot_token: string;
     request: Connection;
     private time: number;
+    private file_id_regex: RegExp;
+    private link_url_regex: RegExp
 
     constructor(BotToken: string, options: ConstructorOptions = { polling_interval: 999, polling: false }){
         super();
         this.bot_token = BotToken;
         this.request = new Connection(this.bot_token);
+        this.file_id_regex = /^\d+:-?\d+:\d+:[a-f0-9]+$/;
+        this.link_url_regex = /^(https?:\/\/)?([a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,})(\/[^\s]*)?$/
         this.time = 999;
         if (options.polling){
             this.poll(options.polling_interval ?? 999);
@@ -102,10 +108,16 @@ export class BaleBot extends EventEmitter{
         }, (res) => {
             if (callback) {
                 if (res.ok){
+                    const phc: ChatPhoto = {
+                        big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                        big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                        small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                        small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                    };
                     const c: Chat = {
                         id: res.result.chat['id'],
                         type: res.result.chat['type'],
-                        photo: res.result.chat['photo']
+                        photo: phc
                     };
                     const f: User = {
                         id: res.result.from['id'],
@@ -176,6 +188,616 @@ export class BaleBot extends EventEmitter{
 
             }
         })
+    }
+
+    async sendMedia(
+        mediaOptions  : MediaUpload,
+        callback      : (call: MessageForm ) => void = (call: any) => {}
+    ){
+        if (existsSync(mediaOptions.path !== undefined ? mediaOptions.path : "")){
+            await this.request.uploadSomething(
+                {
+                    path: mediaOptions.path,
+                    chat_id: mediaOptions.chat_id,
+                    media: mediaOptions.media,
+                    reply_to_message_id: mediaOptions.reply_to_message_id,
+                    reply_markup: mediaOptions.reply_markup
+                },
+                (res) => {
+                    if (res.ok){
+
+                        const f: User = {
+                            id: res['result']?.['from']?.['id'],
+                            is_bot: res['result']?.['from']?.['is_bot'],
+                            first_name: res['result']?.['from']?.['first_name'],
+                            last_name: res['result']?.['from']?.['last_name'],
+                            username: res['result']?.['from']?.['username'],
+                            language_code: res['result']?.['from']?.['language_code'],
+                        };
+
+                        const phc: ChatPhoto = {
+                            big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                            big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                            small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                            small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                        };
+
+                        const c: Chat = {
+                            id: res['result']?.['chat']?.['id'],
+                            first_name: res['result']?.['chat']?.['first_name'],
+                            last_name: res['result']?.['chat']?.['last_name'],
+                            title: res['result']?.['chat']?.['title'],
+                            type: res['result']?.['chat']?.['type'],
+                            invite_link: res['result']?.['chat']?.['invite_link'],
+                            photo: phc
+                        };
+
+                        if (mediaOptions.media === "photo"){
+                            const photos = res['result']?.['photo'];
+                            const phs: PhotoSizeInterface[] = [];
+                            photos.forEach(photo => {
+                                const { file_id, file_unique_id, file_size, width, height } = photo;
+                                phs.push({
+                                    file_id: file_id,
+                                    file_unique_id: file_unique_id,
+                                    file_size: file_size,
+                                    width: width,
+                                    height: height
+                                });
+                            })
+                            const pcb: MessageForm = {
+                                id: res['result']?.['message_id'],
+                                from: f,
+                                chat: c,
+                                date: res['result']?.['date'],
+                                photo: phs,
+                                text: undefined,
+                                caption: res['result']?.['caption']
+                            };
+                            callback(pcb);
+                        } else if (mediaOptions.media === "video"){
+                            const thumb: PhotoSizeInterface = {
+                                file_id: res['result']?.['video']?.['thumb']?.['file_id'],
+                                file_unique_id: res['result']?.['video']?.['thumb']?.['file_unique_id'],
+                                file_size: res['result']?.['video']?.['thumb']?.['file_size'],
+                                width: res['result']?.['video']?.['thumb']?.['width'],
+                                height: res['result']?.['video']?.['thumb']?.['height']
+                            };
+
+                            const video: VideoInterface = {
+                                file_id: res['result']?.['video']?.['file_id'],
+                                file_unique_id: res['result']?.['video']?.['file_unique_id'],
+                                file_size: res['result']?.['video']?.['file_size'],
+                                width: res['result']?.['video']?.['width'],
+                                height: res['result']?.['video']?.['height'],
+                                thumbnail: thumb,
+                                mime_type: res['result']?.['video']?.['mime_type'],
+                                duration: res['result']?.['video']?.['duration']
+                            };
+
+                            const vcb: MessageForm = {
+                                id: res['result']?.['message_id'],
+                                from: f,
+                                chat: c,
+                                date: res['result']?.['date'],
+                                video: video,
+                                text: undefined,
+                                caption: res['result']?.['caption']
+                            };
+                            callback(vcb);
+
+                        } else if (mediaOptions.media === "document"){
+                            const dcmnt: DocumentLikeInterface = {
+                                file_id: res['result']?.['document']?.['file_id'],
+                                file_unique_id: res['result']?.['document']?.['file_unique_id'],
+                                file_name: res['result']?.['document']?.['file_name'],
+                                file_size: res['result']?.['document']?.['file_size'],
+                                mime_type: res['result']?.['document']?.['mime_type']
+                            };
+                            const dcb: MessageForm = {
+                                id: res['result']?.['message_id'],
+                                from: f,
+                                chat: c,
+                                date: res['result']?.['date'],
+                                document: dcmnt,
+                                text: undefined,
+                                caption: res['result']?.['caption']
+                            };
+                            callback(dcb);
+                        } else if (mediaOptions.media === "audio"){
+                            const aud: AudioInterface = {
+                                file_id: res['result']?.['audio']?.['file_id'],
+                                file_unique_id: res['result']?.['audio']?.['file_unique_id'],
+                                duration: res['result']?.['audio']?.['duration'],
+                                file_size: res['result']?.['audio']?.['file_size'],
+                                mime_type: res['result']?.['audio']?.['mime_type']
+                            };
+                            const acb: MessageForm = {
+                                id: res['result']?.['message_id'],
+                                from: f,
+                                chat: c,
+                                date: res['result']?.['date'],
+                                audio: aud,
+                                text: undefined,
+                                caption: res['result']?.['caption']
+                            };
+                            callback(acb);
+                        } else if (mediaOptions.media === "voice"){
+                            const voice: VoiceInterface = {
+                                file_id: res['result']?.['voice']?.['file_id'],
+                                file_unique_id: res['result']?.['voice']?.['file_unique_id'],
+                                duration: res['result']?.['voice']?.['duration'],
+                                file_size: res['result']?.['voice']?.['file_size'],
+                                mime_type: res['result']?.['voice']?.['mime_type']
+                            };
+                            const acb: MessageForm = {
+                                id: res['result']?.['message_id'],
+                                from: f,
+                                chat: c,
+                                date: res['result']?.['date'],
+                                voice: voice,
+                                text: undefined,
+                                caption: res['result']?.['caption']
+                            };
+                            callback(acb);
+                        } else if (mediaOptions.media === "animation"){
+                            const thumb: PhotoSizeInterface = {
+                                file_id: res['result']?.['video']?.['thumb']?.['file_id'],
+                                file_unique_id: res['result']?.['video']?.['thumb']?.['file_unique_id'],
+                                file_size: res['result']?.['video']?.['thumb']?.['file_size'],
+                                width: res['result']?.['video']?.['thumb']?.['width'],
+                                height: res['result']?.['video']?.['thumb']?.['height']
+                            };
+
+                            const animation: AnimationInterface = {
+                                file_id: res['result']?.['animation']?.['file_id'],
+                                file_unique_id: res['result']?.['animation']?.['file_unique_id'],
+                                file_size: res['result']?.['animation']?.['file_size'],
+                                width: res['result']?.['animation']?.['width'],
+                                height: res['result']?.['animation']?.['height'],
+                                thumbnail: thumb,
+                                mime_type: res['result']?.['animation']?.['mime_type'],
+                                duration: res['result']?.['animation']?.['duration']
+                            };
+
+                            const ancb: MessageForm = {
+                                id: res['result']?.['message_id'],
+                                from: f,
+                                chat: c,
+                                date: res['result']?.['date'],
+                                animation: animation,
+                                text: undefined,
+                                caption: res['result']?.['caption']
+                            };
+                            callback(ancb);
+                        }
+                    } else {
+                        let _: MessageForm = {text: undefined};
+                        callback(_);
+                    }
+                }
+            )
+        } else if (mediaOptions.path !== undefined && this.link_url_regex.test(mediaOptions.path)) {
+            const absData = {}
+            Object.defineProperty(absData, "chat_id", {
+                value: mediaOptions.chat_id,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, "caption", {
+                value: mediaOptions.caption,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, "reply_to_message_id", {
+                value: mediaOptions.reply_to_message_id,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, "reply_markup", {
+                value: JSON.stringify({keyboard: mediaOptions.reply_markup}),
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, mediaOptions.media, {
+                value: mediaOptions.path,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            await this.request.makeConnection(`send${this.request.toTitleCase(mediaOptions.media)}`, absData, (res) => {
+                if (res.ok){
+
+                    const f: User = {
+                        id: res['result']?.['from']?.['id'],
+                        is_bot: res['result']?.['from']?.['is_bot'],
+                        first_name: res['result']?.['from']?.['first_name'],
+                        last_name: res['result']?.['from']?.['last_name'],
+                        username: res['result']?.['from']?.['username'],
+                        language_code: res['result']?.['from']?.['language_code'],
+                    };
+
+                    const phc: ChatPhoto = {
+                        big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                        big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                        small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                        small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                    };
+
+                    const c: Chat = {
+                        id: res['result']?.['chat']?.['id'],
+                        first_name: res['result']?.['chat']?.['first_name'],
+                        last_name: res['result']?.['chat']?.['last_name'],
+                        title: res['result']?.['chat']?.['title'],
+                        type: res['result']?.['chat']?.['type'],
+                        invite_link: res['result']?.['chat']?.['invite_link'],
+                        photo: phc
+                    };
+
+                    if (mediaOptions.media === "photo"){
+                        const photos = res['result']?.['photo'];
+                        const phs: PhotoSizeInterface[] = [];
+                        photos.forEach(photo => {
+                            const { file_id, file_unique_id, file_size, width, height } = photo;
+                            phs.push({
+                                file_id: file_id,
+                                file_unique_id: file_unique_id,
+                                file_size: file_size,
+                                width: width,
+                                height: height
+                            });
+                        })
+                        const pcb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            photo: phs,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(pcb);
+                    } else if (mediaOptions.media === "video"){
+                        const thumb: PhotoSizeInterface = {
+                            file_id: res['result']?.['video']?.['thumb']?.['file_id'],
+                            file_unique_id: res['result']?.['video']?.['thumb']?.['file_unique_id'],
+                            file_size: res['result']?.['video']?.['thumb']?.['file_size'],
+                            width: res['result']?.['video']?.['thumb']?.['width'],
+                            height: res['result']?.['video']?.['thumb']?.['height']
+                        };
+
+                        const video: VideoInterface = {
+                            file_id: res['result']?.['video']?.['file_id'],
+                            file_unique_id: res['result']?.['video']?.['file_unique_id'],
+                            file_size: res['result']?.['video']?.['file_size'],
+                            width: res['result']?.['video']?.['width'],
+                            height: res['result']?.['video']?.['height'],
+                            thumbnail: thumb,
+                            mime_type: res['result']?.['video']?.['mime_type'],
+                            duration: res['result']?.['video']?.['duration']
+                        };
+
+                        const vcb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            video: video,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(vcb);
+
+                    } else if (mediaOptions.media === "document"){
+                        const dcmnt: DocumentLikeInterface = {
+                            file_id: res['result']?.['document']?.['file_id'],
+                            file_unique_id: res['result']?.['document']?.['file_unique_id'],
+                            file_name: res['result']?.['document']?.['file_name'],
+                            file_size: res['result']?.['document']?.['file_size'],
+                            mime_type: res['result']?.['document']?.['mime_type']
+                        };
+                        const dcb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            document: dcmnt,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(dcb);
+                    } else if (mediaOptions.media === "audio"){
+                        const aud: AudioInterface = {
+                            file_id: res['result']?.['audio']?.['file_id'],
+                            file_unique_id: res['result']?.['audio']?.['file_unique_id'],
+                            duration: res['result']?.['audio']?.['duration'],
+                            file_size: res['result']?.['audio']?.['file_size'],
+                            mime_type: res['result']?.['audio']?.['mime_type']
+                        };
+                        const acb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            audio: aud,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(acb);
+                    } else if (mediaOptions.media === "voice"){
+                        const voice: VoiceInterface = {
+                            file_id: res['result']?.['voice']?.['file_id'],
+                            file_unique_id: res['result']?.['voice']?.['file_unique_id'],
+                            duration: res['result']?.['voice']?.['duration'],
+                            file_size: res['result']?.['voice']?.['file_size'],
+                            mime_type: res['result']?.['voice']?.['mime_type']
+                        };
+                        const acb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            voice: voice,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(acb);
+                    } else if (mediaOptions.media === "animation"){
+                        const thumb: PhotoSizeInterface = {
+                            file_id: res['result']?.['video']?.['thumb']?.['file_id'],
+                            file_unique_id: res['result']?.['video']?.['thumb']?.['file_unique_id'],
+                            file_size: res['result']?.['video']?.['thumb']?.['file_size'],
+                            width: res['result']?.['video']?.['thumb']?.['width'],
+                            height: res['result']?.['video']?.['thumb']?.['height']
+                        };
+
+                        const animation: AnimationInterface = {
+                            file_id: res['result']?.['animation']?.['file_id'],
+                            file_unique_id: res['result']?.['animation']?.['file_unique_id'],
+                            file_size: res['result']?.['animation']?.['file_size'],
+                            width: res['result']?.['animation']?.['width'],
+                            height: res['result']?.['animation']?.['height'],
+                            thumbnail: thumb,
+                            mime_type: res['result']?.['animation']?.['mime_type'],
+                            duration: res['result']?.['animation']?.['duration']
+                        };
+
+                        const ancb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            animation: animation,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(ancb);
+                    }
+                } else {
+                    let _: MessageForm = {text: undefined};
+                    callback(_);
+                }
+            });
+        } else if (mediaOptions.file_id !== undefined && this.file_id_regex.test(mediaOptions.file_id)) {
+            const absData = {}
+            Object.defineProperty(absData, "chat_id", {
+                value: mediaOptions.chat_id,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, "caption", {
+                value: mediaOptions.caption,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, "reply_to_message_id", {
+                value: mediaOptions.reply_to_message_id,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, "reply_markup", {
+                value: JSON.stringify({keyboard: mediaOptions.reply_markup}),
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(absData, mediaOptions.media, {
+                value: mediaOptions.file_id,
+                writable: true,
+                enumerable: true,
+                configurable: true
+            });
+
+            await this.request.makeConnection(`send${this.request.toTitleCase(mediaOptions.media)}`, absData, (res) => {
+                if (res.ok){
+
+                    const f: User = {
+                        id: res['result']?.['from']?.['id'],
+                        is_bot: res['result']?.['from']?.['is_bot'],
+                        first_name: res['result']?.['from']?.['first_name'],
+                        last_name: res['result']?.['from']?.['last_name'],
+                        username: res['result']?.['from']?.['username'],
+                        language_code: res['result']?.['from']?.['language_code'],
+                    };
+
+                    const phc: ChatPhoto = {
+                        big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                        big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                        small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                        small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                    };
+
+                    const c: Chat = {
+                        id: res['result']?.['chat']?.['id'],
+                        first_name: res['result']?.['chat']?.['first_name'],
+                        last_name: res['result']?.['chat']?.['last_name'],
+                        title: res['result']?.['chat']?.['title'],
+                        type: res['result']?.['chat']?.['type'],
+                        invite_link: res['result']?.['chat']?.['invite_link'],
+                        photo: phc
+                    };
+
+                    if (mediaOptions.media === "photo"){
+                        const photos = res['result']?.['photo'];
+                        const phs: PhotoSizeInterface[] = [];
+                        photos.forEach(photo => {
+                            const { file_id, file_unique_id, file_size, width, height } = photo;
+                            phs.push({
+                                file_id: file_id,
+                                file_unique_id: file_unique_id,
+                                file_size: file_size,
+                                width: width,
+                                height: height
+                            });
+                        })
+                        const pcb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            photo: phs,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(pcb);
+                    } else if (mediaOptions.media === "video"){
+                        const thumb: PhotoSizeInterface = {
+                            file_id: res['result']?.['video']?.['thumb']?.['file_id'],
+                            file_unique_id: res['result']?.['video']?.['thumb']?.['file_unique_id'],
+                            file_size: res['result']?.['video']?.['thumb']?.['file_size'],
+                            width: res['result']?.['video']?.['thumb']?.['width'],
+                            height: res['result']?.['video']?.['thumb']?.['height']
+                        };
+
+                        const video: VideoInterface = {
+                            file_id: res['result']?.['video']?.['file_id'],
+                            file_unique_id: res['result']?.['video']?.['file_unique_id'],
+                            file_size: res['result']?.['video']?.['file_size'],
+                            width: res['result']?.['video']?.['width'],
+                            height: res['result']?.['video']?.['height'],
+                            thumbnail: thumb,
+                            mime_type: res['result']?.['video']?.['mime_type'],
+                            duration: res['result']?.['video']?.['duration']
+                        };
+
+                        const vcb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            video: video,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(vcb);
+
+                    } else if (mediaOptions.media === "document"){
+                        const dcmnt: DocumentLikeInterface = {
+                            file_id: res['result']?.['document']?.['file_id'],
+                            file_unique_id: res['result']?.['document']?.['file_unique_id'],
+                            file_name: res['result']?.['document']?.['file_name'],
+                            file_size: res['result']?.['document']?.['file_size'],
+                            mime_type: res['result']?.['document']?.['mime_type']
+                        };
+                        const dcb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            document: dcmnt,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(dcb);
+                    } else if (mediaOptions.media === "audio"){
+                        const aud: AudioInterface = {
+                            file_id: res['result']?.['audio']?.['file_id'],
+                            file_unique_id: res['result']?.['audio']?.['file_unique_id'],
+                            duration: res['result']?.['audio']?.['duration'],
+                            file_size: res['result']?.['audio']?.['file_size'],
+                            mime_type: res['result']?.['audio']?.['mime_type']
+                        };
+                        const acb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            audio: aud,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(acb);
+                    } else if (mediaOptions.media === "voice"){
+                        const voice: VoiceInterface = {
+                            file_id: res['result']?.['voice']?.['file_id'],
+                            file_unique_id: res['result']?.['voice']?.['file_unique_id'],
+                            duration: res['result']?.['voice']?.['duration'],
+                            file_size: res['result']?.['voice']?.['file_size'],
+                            mime_type: res['result']?.['voice']?.['mime_type']
+                        };
+                        const acb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            voice: voice,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(acb);
+                    } else if (mediaOptions.media === "animation"){
+                        const thumb: PhotoSizeInterface = {
+                            file_id: res['result']?.['video']?.['thumb']?.['file_id'],
+                            file_unique_id: res['result']?.['video']?.['thumb']?.['file_unique_id'],
+                            file_size: res['result']?.['video']?.['thumb']?.['file_size'],
+                            width: res['result']?.['video']?.['thumb']?.['width'],
+                            height: res['result']?.['video']?.['thumb']?.['height']
+                        };
+
+                        const animation: AnimationInterface = {
+                            file_id: res['result']?.['animation']?.['file_id'],
+                            file_unique_id: res['result']?.['animation']?.['file_unique_id'],
+                            file_size: res['result']?.['animation']?.['file_size'],
+                            width: res['result']?.['animation']?.['width'],
+                            height: res['result']?.['animation']?.['height'],
+                            thumbnail: thumb,
+                            mime_type: res['result']?.['animation']?.['mime_type'],
+                            duration: res['result']?.['animation']?.['duration']
+                        };
+
+                        const ancb: MessageForm = {
+                            id: res['result']?.['message_id'],
+                            from: f,
+                            chat: c,
+                            date: res['result']?.['date'],
+                            animation: animation,
+                            text: undefined,
+                            caption: res['result']?.['caption']
+                        };
+                        callback(ancb);
+                    }
+                } else {
+                    let _: MessageForm = {text: undefined};
+                    callback(_);
+                }
+            });
+        }
     }
 
     async poll(intervalTime: number | undefined){
@@ -461,55 +1083,53 @@ export class BaleBot extends EventEmitter{
 
 }
 
-
-
-// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling_interval: 999, polling: true });
-
-
-// b.on("message", (msg) => {
-//     if (msg.text.startsWith("/start")){
-//         b.sendMessage(
-//             msg.chat.id,
-//             "Hi",
-//             {
-//                 reply_to_message_id: msg.id,
-//                 keyboard_mode: "inline_keyboard",
-//                 reply_markup: [
-//                     [
-//                         {
-//                             text: "close message",
-//                             callback_data: "close"
-//                         }
-//                     ]
-//                 ]
-//             }
-//         )
-//     }
-// })
-
-// b.on("callback_query", (call) => {
-//     console.log(call)
-//     if (call.data === "close"){
-//         b.sendMessage(
-//             call.chat_instance,
-//             "Message will delete",
-//             {
-//                 reply_to_message_id: call.message.id
-//             },
-//             (a) => {console.log(a)}
-//         )
-//     }
-// })
-
-// bot.forwardMessage(
+const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp");
+b.sendMedia({
+    media: "animation",
+    path: "./movie.mp4",
+    caption: "hi",
+    chat_id: 554324725,
+}, (bs) => {
+    console.log(bs)
+})
+// b.sendPhoto(
 //     554324725,
+//     "I:\\ws2.png",
 //     {
-//         to_chat: 554324725,
-//         message_id: 172
+//         reply_markup: [
+//             [
+//                 {
+//                     text: "KO",
+//                     request_contact: true
+//                 }
+//             ]
+//         ]
 //     },
-//     (msg) => {
-//         console.log(msg)
-//     }
+//     (msg) => { console.log(msg.photo) }
+// )
+
+
+// b.sendPhoto(
+//     554324725,
+//     "https://avatars.githubusercontent.com/u/196440184?v=4",
+//     {
+//         reply_markup: [
+//             [
+//                 {
+//                     text: "KO",
+//                     request_contact: true
+//                 }
+//             ]
+//         ]
+//     },
+//     (msg) => { console.log(msg.photo) }
+// )
+
+// b.sendMessage(
+//     554324725,
+//     "hi",
+//     {},
+//     (c) => { console.log(c) }
 // )
 
 module.exports = { BaleBot };

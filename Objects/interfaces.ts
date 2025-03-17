@@ -1,5 +1,6 @@
 export type chatTypes = 'private' | 'group' | 'channel';
 export type stickerTypes = 'regular' | 'mask';
+export type medias = "photo" | "video" | "animation" | "audio" | "voice" | "document";
 export type MessageTypes = 
   | 'message'
   | 'photo'
@@ -55,7 +56,6 @@ export interface PhotoSizeInterface {
     file_unique_id?: string | undefined;
     width?: number | undefined;
     height?: number | undefined;
-    size?: number | undefined;
     file_size?: number | undefined;
 }
 
@@ -94,9 +94,10 @@ export interface VideoInterface {
     width?: number | undefined;
     height?: number | undefined;
     duration?: number | undefined;
-    file_name?: string | undefined;
+    //file_name?: string | undefined;
     mime_type?: string | undefined;
     file_size?: number | undefined;
+    thumbnail?: PhotoSizeInterface | undefined;
 }
 
 export interface VoiceInterface {
@@ -213,7 +214,7 @@ export interface MessageForm {
     forward_date?: number | undefined;
     edit_date?: number | undefined;
     text: string | undefined;
-    animation?: Animation | undefined;
+    animation?: AnimationInterface | undefined;
     audio?: AudioInterface | undefined;
     voice?: VoiceInterface | undefined;
     document?: DocumentLikeInterface | undefined;
@@ -247,5 +248,43 @@ export interface ForwardOptions {
     message_id?: number | undefined;
     to_chat?: number | undefined;
 }
+
+export interface MediaOptions {
+    reply_to_message_id?: number | undefined;
+    reply_markup?: ReplyKeyboard | undefined;
+    caption?: string | undefined;
+}
+
+export interface MediaUpload {
+    path?: string;
+    file_id?: string | undefined;
+    chat_id: number;
+    media: medias;
+    caption?: string | undefined;
+    reply_to_message_id?: number | undefined;
+    reply_markup?: ReplyKeyboard | undefined;
+}
+
+export interface PhotoCallback {
+    id?: number | undefined;
+    from?: User | undefined;
+    date?: number | undefined;
+    chat?: Chat | undefined;
+    photo?: Array<PhotoSizeInterface> | undefined;
+    caption?: string | undefined;
+}
+
+export interface VideoCallback {
+    file_id?: string | undefined;
+    file_unique_id?: string | undefined;
+    width?: number | undefined;
+    height?: number | undefined;
+    duration?: number | undefined;
+    thumbnail?: PhotoSizeInterface | undefined;
+    file_name?: string | undefined;
+    mime_type?: string | undefined;
+    file_size?: number | undefined;
+}
+
 
 module.exports = { MaskText };

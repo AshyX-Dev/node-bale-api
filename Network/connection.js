@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,6 +48,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Connection = void 0;
+var axios = require("axios");
+var fs_1 = require("fs");
+var path_1 = require("path");
+var FormData = require("form-data");
 var Connection = /** @class */ (function () {
     function Connection(token) {
         this.token = token;
@@ -69,6 +84,53 @@ var Connection = /** @class */ (function () {
                         e_1 = _a.sent();
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Connection.prototype.toTitleCase = function (str) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(function (word) { return word.charAt(0).toUpperCase() + word.slice(1); })
+            .join(' ');
+    };
+    Connection.prototype.uploadSomething = function (opts_1) {
+        return __awaiter(this, arguments, void 0, function (opts, callback) {
+            var fileStream, formData, error_1;
+            var _a;
+            if (callback === void 0) { callback = function (data) { }; }
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        fileStream = (0, fs_1.createReadStream)(opts.path);
+                        formData = new FormData();
+                        formData.append("chat_id", opts.chat_id.toString());
+                        formData.append(opts.media, fileStream, (0, path_1.basename)(opts.path));
+                        formData.append("caption", (_a = opts.caption) !== null && _a !== void 0 ? _a : "");
+                        if (opts.reply_to_message_id !== undefined) {
+                            formData.append("reply_to_message_id", opts.reply_to_message_id.toString());
+                        }
+                        if (opts.reply_markup !== undefined) {
+                            formData.append("reply_markup", JSON.stringify({ keyboard: opts.reply_markup }));
+                        }
+                        return [4 /*yield*/, axios.post("https://tapi.bale.ai/bot".concat(this.token, "/send").concat(this.toTitleCase(opts.media)), formData, {
+                                headers: __assign({}, formData.getHeaders()),
+                            }).then(function (resp) {
+                                callback(resp.data);
+                            })];
+                    case 1:
+                        _b.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_1 = _b.sent();
+                        callback({
+                            ok: false,
+                            message: error_1
+                        });
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
                 }
             });
         });
