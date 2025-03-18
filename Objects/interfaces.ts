@@ -286,5 +286,10 @@ export interface VideoCallback {
     file_size?: number | undefined;
 }
 
+export interface reWrite {
+    ok: boolean;
+    error_message?: string | undefined;
+    data?: string | undefined;
+}
 
 module.exports = { MaskText };

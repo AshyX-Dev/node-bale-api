@@ -82,6 +82,7 @@ var Connection = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         e_1 = _a.sent();
+                        callback({ ok: false, local_error: e_1 });
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
@@ -131,6 +132,37 @@ var Connection = /** @class */ (function () {
                         });
                         return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Connection.prototype.fileConnection = function (filePath_1) {
+        return __awaiter(this, arguments, void 0, function (filePath, callback) {
+            var url, _, res, e_2;
+            if (callback === void 0) { callback = function (data) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        url = this.file_url + filePath;
+                        return [4 /*yield*/, fetch(url, {
+                                method: "GET",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                }
+                            })];
+                    case 1:
+                        _ = _a.sent();
+                        return [4 /*yield*/, _.text()];
+                    case 2:
+                        res = _a.sent();
+                        callback(res);
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_2 = _a.sent();
+                        callback({ ok: false, local_error: e_2 });
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });

@@ -31,7 +31,9 @@ export class Connection {
             });
             const res = await _.json();
             callback(res);
-        } catch (e) {}
+        } catch (e) {
+            callback({ok: false, local_error: e});
+        }
     }
 
     toTitleCase(str: string): string {
@@ -68,6 +70,22 @@ export class Connection {
                 ok: false,
                 message: error
             });
+        }
+    }
+
+    async fileConnection(filePath: string, callback: (data: any) => void = (data: any) => {}){
+        try{
+            const url = this.file_url+filePath;
+            const _ = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            const res = await _.text();
+            callback(res);
+        } catch (e) {
+            callback({ok: false, local_error: e});
         }
     }
 }
