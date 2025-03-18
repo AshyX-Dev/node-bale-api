@@ -100,15 +100,17 @@ var BaleBot = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, this.request.makeConnection("getMe", {}, function (res) {
                             if (callback) {
                                 if (res.ok) {
-                                    var u = {
+                                    callback({
                                         id: res.result['id'],
                                         is_bot: res.result['is_bot'],
                                         first_name: res.result['first_name'],
                                         last_name: res.result['last_name'],
                                         username: res.result['username'],
                                         language_code: res.result['language_code']
-                                    };
-                                    callback(u);
+                                    });
+                                }
+                                else {
+                                    callback({});
                                 }
                             }
                         })];
@@ -176,33 +178,32 @@ var BaleBot = /** @class */ (function (_super) {
                                 var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
                                 if (callback) {
                                     if (res.ok) {
-                                        var phc = {
-                                            big_file_id: (_c = (_b = (_a = res['result']) === null || _a === void 0 ? void 0 : _a['chat']) === null || _b === void 0 ? void 0 : _b['photo']) === null || _c === void 0 ? void 0 : _c['big_file_id'],
-                                            big_file_unique_id: (_f = (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['chat']) === null || _e === void 0 ? void 0 : _e['photo']) === null || _f === void 0 ? void 0 : _f['big_file_unique_id'],
-                                            small_file_id: (_j = (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['chat']) === null || _h === void 0 ? void 0 : _h['photo']) === null || _j === void 0 ? void 0 : _j['small_file_id'],
-                                            small_file_unique_id: (_m = (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['chat']) === null || _l === void 0 ? void 0 : _l['photo']) === null || _m === void 0 ? void 0 : _m['small_file_unique_id'],
-                                        };
-                                        var c = {
-                                            id: res.result.chat['id'],
-                                            type: res.result.chat['type'],
-                                            photo: phc
-                                        };
-                                        var f = {
-                                            id: res.result.from['id'],
-                                            is_bot: res.result.from['is_bot'],
-                                            first_name: res.result.from['first_name'],
-                                            last_name: res.result.from['last_name'],
-                                            username: res.result.from['username'],
-                                            language_code: res.result.from['language_code']
-                                        };
-                                        var m = {
+                                        callback({
                                             text: text,
-                                            from: f,
+                                            from: {
+                                                id: res.result.from['id'],
+                                                is_bot: res.result.from['is_bot'],
+                                                first_name: res.result.from['first_name'],
+                                                last_name: res.result.from['last_name'],
+                                                username: res.result.from['username'],
+                                                language_code: res.result.from['language_code']
+                                            },
                                             id: res.result['message_id'],
                                             date: res.result['date'],
-                                            chat: c
-                                        };
-                                        callback(m);
+                                            chat: {
+                                                id: res.result.chat['id'],
+                                                type: res.result.chat['type'],
+                                                photo: {
+                                                    big_file_id: (_c = (_b = (_a = res['result']) === null || _a === void 0 ? void 0 : _a['chat']) === null || _b === void 0 ? void 0 : _b['photo']) === null || _c === void 0 ? void 0 : _c['big_file_id'],
+                                                    big_file_unique_id: (_f = (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['chat']) === null || _e === void 0 ? void 0 : _e['photo']) === null || _f === void 0 ? void 0 : _f['big_file_unique_id'],
+                                                    small_file_id: (_j = (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['chat']) === null || _h === void 0 ? void 0 : _h['photo']) === null || _j === void 0 ? void 0 : _j['small_file_id'],
+                                                    small_file_unique_id: (_m = (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['chat']) === null || _l === void 0 ? void 0 : _l['photo']) === null || _m === void 0 ? void 0 : _m['small_file_unique_id'],
+                                                }
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        callback({ text: undefined });
                                     }
                                 }
                             })];
@@ -223,41 +224,47 @@ var BaleBot = /** @class */ (function (_super) {
                             chat_id: options.to_chat,
                             message_id: options.message_id
                         }, function (res) {
-                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14;
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26;
                             if (res.ok) {
-                                var f = {
-                                    id: (_b = (_a = res['result']) === null || _a === void 0 ? void 0 : _a['from']) === null || _b === void 0 ? void 0 : _b['id'],
-                                    is_bot: (_d = (_c = res['result']) === null || _c === void 0 ? void 0 : _c['from']) === null || _d === void 0 ? void 0 : _d['is_bot'],
-                                    first_name: (_f = (_e = res['result']) === null || _e === void 0 ? void 0 : _e['from']) === null || _f === void 0 ? void 0 : _f['first_name'],
-                                    last_name: (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['from']) === null || _h === void 0 ? void 0 : _h['last_name'],
-                                    username: (_k = (_j = res['result']) === null || _j === void 0 ? void 0 : _j['from']) === null || _k === void 0 ? void 0 : _k['username'],
-                                    language_code: (_m = (_l = res['result']) === null || _l === void 0 ? void 0 : _l['from']) === null || _m === void 0 ? void 0 : _m['language_code'],
-                                };
-                                var phc = {
-                                    big_file_id: (_q = (_p = (_o = res['result']) === null || _o === void 0 ? void 0 : _o['chat']) === null || _p === void 0 ? void 0 : _p['photo']) === null || _q === void 0 ? void 0 : _q['big_file_id'],
-                                    big_file_unique_id: (_t = (_s = (_r = res['result']) === null || _r === void 0 ? void 0 : _r['chat']) === null || _s === void 0 ? void 0 : _s['photo']) === null || _t === void 0 ? void 0 : _t['big_file_unique_id'],
-                                    small_file_id: (_w = (_v = (_u = res['result']) === null || _u === void 0 ? void 0 : _u['chat']) === null || _v === void 0 ? void 0 : _v['photo']) === null || _w === void 0 ? void 0 : _w['small_file_id'],
-                                    small_file_unique_id: (_z = (_y = (_x = res['result']) === null || _x === void 0 ? void 0 : _x['chat']) === null || _y === void 0 ? void 0 : _y['photo']) === null || _z === void 0 ? void 0 : _z['small_file_unique_id'],
-                                };
-                                var c = {
-                                    id: (_1 = (_0 = res['result']) === null || _0 === void 0 ? void 0 : _0['chat']) === null || _1 === void 0 ? void 0 : _1['id'],
-                                    first_name: (_3 = (_2 = res['result']) === null || _2 === void 0 ? void 0 : _2['chat']) === null || _3 === void 0 ? void 0 : _3['first_name'],
-                                    last_name: (_5 = (_4 = res['result']) === null || _4 === void 0 ? void 0 : _4['chat']) === null || _5 === void 0 ? void 0 : _5['last_name'],
-                                    title: (_7 = (_6 = res['result']) === null || _6 === void 0 ? void 0 : _6['chat']) === null || _7 === void 0 ? void 0 : _7['title'],
-                                    type: (_9 = (_8 = res['result']) === null || _8 === void 0 ? void 0 : _8['chat']) === null || _9 === void 0 ? void 0 : _9['type'],
-                                    invite_link: (_11 = (_10 = res['result']) === null || _10 === void 0 ? void 0 : _10['chat']) === null || _11 === void 0 ? void 0 : _11['invite_link'],
-                                    photo: phc
-                                };
-                                var fm = {
-                                    id: (_12 = res['result']) === null || _12 === void 0 ? void 0 : _12['message_id'],
-                                    from: f,
-                                    date: (_13 = res['result']) === null || _13 === void 0 ? void 0 : _13['date'],
-                                    chat: c,
-                                    forward_from: f,
-                                    forward_date: (_14 = res['result']) === null || _14 === void 0 ? void 0 : _14['forward_date'],
+                                callback({
+                                    id: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['message_id'],
+                                    from: {
+                                        id: (_c = (_b = res['result']) === null || _b === void 0 ? void 0 : _b['from']) === null || _c === void 0 ? void 0 : _c['id'],
+                                        is_bot: (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['from']) === null || _e === void 0 ? void 0 : _e['is_bot'],
+                                        first_name: (_g = (_f = res['result']) === null || _f === void 0 ? void 0 : _f['from']) === null || _g === void 0 ? void 0 : _g['first_name'],
+                                        last_name: (_j = (_h = res['result']) === null || _h === void 0 ? void 0 : _h['from']) === null || _j === void 0 ? void 0 : _j['last_name'],
+                                        username: (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['from']) === null || _l === void 0 ? void 0 : _l['username'],
+                                        language_code: (_o = (_m = res['result']) === null || _m === void 0 ? void 0 : _m['from']) === null || _o === void 0 ? void 0 : _o['language_code'],
+                                    },
+                                    date: (_p = res['result']) === null || _p === void 0 ? void 0 : _p['date'],
+                                    chat: {
+                                        id: (_r = (_q = res['result']) === null || _q === void 0 ? void 0 : _q['chat']) === null || _r === void 0 ? void 0 : _r['id'],
+                                        first_name: (_t = (_s = res['result']) === null || _s === void 0 ? void 0 : _s['chat']) === null || _t === void 0 ? void 0 : _t['first_name'],
+                                        last_name: (_v = (_u = res['result']) === null || _u === void 0 ? void 0 : _u['chat']) === null || _v === void 0 ? void 0 : _v['last_name'],
+                                        title: (_x = (_w = res['result']) === null || _w === void 0 ? void 0 : _w['chat']) === null || _x === void 0 ? void 0 : _x['title'],
+                                        type: (_z = (_y = res['result']) === null || _y === void 0 ? void 0 : _y['chat']) === null || _z === void 0 ? void 0 : _z['type'],
+                                        invite_link: (_1 = (_0 = res['result']) === null || _0 === void 0 ? void 0 : _0['chat']) === null || _1 === void 0 ? void 0 : _1['invite_link'],
+                                        photo: {
+                                            big_file_id: (_4 = (_3 = (_2 = res['result']) === null || _2 === void 0 ? void 0 : _2['chat']) === null || _3 === void 0 ? void 0 : _3['photo']) === null || _4 === void 0 ? void 0 : _4['big_file_id'],
+                                            big_file_unique_id: (_7 = (_6 = (_5 = res['result']) === null || _5 === void 0 ? void 0 : _5['chat']) === null || _6 === void 0 ? void 0 : _6['photo']) === null || _7 === void 0 ? void 0 : _7['big_file_unique_id'],
+                                            small_file_id: (_10 = (_9 = (_8 = res['result']) === null || _8 === void 0 ? void 0 : _8['chat']) === null || _9 === void 0 ? void 0 : _9['photo']) === null || _10 === void 0 ? void 0 : _10['small_file_id'],
+                                            small_file_unique_id: (_13 = (_12 = (_11 = res['result']) === null || _11 === void 0 ? void 0 : _11['chat']) === null || _12 === void 0 ? void 0 : _12['photo']) === null || _13 === void 0 ? void 0 : _13['small_file_unique_id'],
+                                        }
+                                    },
+                                    forward_from: {
+                                        id: (_15 = (_14 = res['result']) === null || _14 === void 0 ? void 0 : _14['from']) === null || _15 === void 0 ? void 0 : _15['id'],
+                                        is_bot: (_17 = (_16 = res['result']) === null || _16 === void 0 ? void 0 : _16['from']) === null || _17 === void 0 ? void 0 : _17['is_bot'],
+                                        first_name: (_19 = (_18 = res['result']) === null || _18 === void 0 ? void 0 : _18['from']) === null || _19 === void 0 ? void 0 : _19['first_name'],
+                                        last_name: (_21 = (_20 = res['result']) === null || _20 === void 0 ? void 0 : _20['from']) === null || _21 === void 0 ? void 0 : _21['last_name'],
+                                        username: (_23 = (_22 = res['result']) === null || _22 === void 0 ? void 0 : _22['from']) === null || _23 === void 0 ? void 0 : _23['username'],
+                                        language_code: (_25 = (_24 = res['result']) === null || _24 === void 0 ? void 0 : _24['from']) === null || _25 === void 0 ? void 0 : _25['language_code'],
+                                    },
+                                    forward_date: (_26 = res['result']) === null || _26 === void 0 ? void 0 : _26['forward_date'],
                                     text: undefined
-                                };
-                                callback(fm);
+                                });
+                            }
+                            else {
+                                callback({ text: undefined });
                             }
                         })];
                     case 1:
@@ -891,45 +898,39 @@ var BaleBot = /** @class */ (function (_super) {
                         }, function (res) {
                             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16;
                             if (res.ok) {
-                                var f = {
-                                    id: (_b = (_a = res['result']) === null || _a === void 0 ? void 0 : _a['from']) === null || _b === void 0 ? void 0 : _b['id'],
-                                    is_bot: (_d = (_c = res['result']) === null || _c === void 0 ? void 0 : _c['from']) === null || _d === void 0 ? void 0 : _d['is_bot'],
-                                    first_name: (_f = (_e = res['result']) === null || _e === void 0 ? void 0 : _e['from']) === null || _f === void 0 ? void 0 : _f['first_name'],
-                                    last_name: (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['from']) === null || _h === void 0 ? void 0 : _h['last_name'],
-                                    username: (_k = (_j = res['result']) === null || _j === void 0 ? void 0 : _j['from']) === null || _k === void 0 ? void 0 : _k['username'],
-                                    language_code: (_m = (_l = res['result']) === null || _l === void 0 ? void 0 : _l['from']) === null || _m === void 0 ? void 0 : _m['language_code'],
-                                };
-                                var phc = {
-                                    big_file_id: (_q = (_p = (_o = res['result']) === null || _o === void 0 ? void 0 : _o['chat']) === null || _p === void 0 ? void 0 : _p['photo']) === null || _q === void 0 ? void 0 : _q['big_file_id'],
-                                    big_file_unique_id: (_t = (_s = (_r = res['result']) === null || _r === void 0 ? void 0 : _r['chat']) === null || _s === void 0 ? void 0 : _s['photo']) === null || _t === void 0 ? void 0 : _t['big_file_unique_id'],
-                                    small_file_id: (_w = (_v = (_u = res['result']) === null || _u === void 0 ? void 0 : _u['chat']) === null || _v === void 0 ? void 0 : _v['photo']) === null || _w === void 0 ? void 0 : _w['small_file_id'],
-                                    small_file_unique_id: (_z = (_y = (_x = res['result']) === null || _x === void 0 ? void 0 : _x['chat']) === null || _y === void 0 ? void 0 : _y['photo']) === null || _z === void 0 ? void 0 : _z['small_file_unique_id'],
-                                };
-                                var c = {
-                                    id: (_1 = (_0 = res['result']) === null || _0 === void 0 ? void 0 : _0['chat']) === null || _1 === void 0 ? void 0 : _1['id'],
-                                    first_name: (_3 = (_2 = res['result']) === null || _2 === void 0 ? void 0 : _2['chat']) === null || _3 === void 0 ? void 0 : _3['first_name'],
-                                    last_name: (_5 = (_4 = res['result']) === null || _4 === void 0 ? void 0 : _4['chat']) === null || _5 === void 0 ? void 0 : _5['last_name'],
-                                    title: (_7 = (_6 = res['result']) === null || _6 === void 0 ? void 0 : _6['chat']) === null || _7 === void 0 ? void 0 : _7['title'],
-                                    type: (_9 = (_8 = res['result']) === null || _8 === void 0 ? void 0 : _8['chat']) === null || _9 === void 0 ? void 0 : _9['type'],
-                                    invite_link: (_11 = (_10 = res['result']) === null || _10 === void 0 ? void 0 : _10['chat']) === null || _11 === void 0 ? void 0 : _11['invite_link'],
-                                    photo: phc
-                                };
-                                var location_ = {
-                                    longitude: (_13 = (_12 = res['result']) === null || _12 === void 0 ? void 0 : _12['location']) === null || _13 === void 0 ? void 0 : _13['longitude'],
-                                    latitude: (_15 = (_14 = res['result']) === null || _14 === void 0 ? void 0 : _14['location']) === null || _15 === void 0 ? void 0 : _15['latitude']
-                                };
-                                var msg = {
-                                    id: (_16 = res['result']) === null || _16 === void 0 ? void 0 : _16['message_id'],
-                                    chat: c,
-                                    from: f,
-                                    location: location_,
+                                callback({
+                                    id: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['message_id'],
+                                    chat: {
+                                        id: (_c = (_b = res['result']) === null || _b === void 0 ? void 0 : _b['chat']) === null || _c === void 0 ? void 0 : _c['id'],
+                                        first_name: (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['chat']) === null || _e === void 0 ? void 0 : _e['first_name'],
+                                        last_name: (_g = (_f = res['result']) === null || _f === void 0 ? void 0 : _f['chat']) === null || _g === void 0 ? void 0 : _g['last_name'],
+                                        title: (_j = (_h = res['result']) === null || _h === void 0 ? void 0 : _h['chat']) === null || _j === void 0 ? void 0 : _j['title'],
+                                        type: (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['chat']) === null || _l === void 0 ? void 0 : _l['type'],
+                                        invite_link: (_o = (_m = res['result']) === null || _m === void 0 ? void 0 : _m['chat']) === null || _o === void 0 ? void 0 : _o['invite_link'],
+                                        photo: {
+                                            big_file_id: (_r = (_q = (_p = res['result']) === null || _p === void 0 ? void 0 : _p['chat']) === null || _q === void 0 ? void 0 : _q['photo']) === null || _r === void 0 ? void 0 : _r['big_file_id'],
+                                            big_file_unique_id: (_u = (_t = (_s = res['result']) === null || _s === void 0 ? void 0 : _s['chat']) === null || _t === void 0 ? void 0 : _t['photo']) === null || _u === void 0 ? void 0 : _u['big_file_unique_id'],
+                                            small_file_id: (_x = (_w = (_v = res['result']) === null || _v === void 0 ? void 0 : _v['chat']) === null || _w === void 0 ? void 0 : _w['photo']) === null || _x === void 0 ? void 0 : _x['small_file_id'],
+                                            small_file_unique_id: (_0 = (_z = (_y = res['result']) === null || _y === void 0 ? void 0 : _y['chat']) === null || _z === void 0 ? void 0 : _z['photo']) === null || _0 === void 0 ? void 0 : _0['small_file_unique_id'],
+                                        }
+                                    },
+                                    from: {
+                                        id: (_2 = (_1 = res['result']) === null || _1 === void 0 ? void 0 : _1['from']) === null || _2 === void 0 ? void 0 : _2['id'],
+                                        is_bot: (_4 = (_3 = res['result']) === null || _3 === void 0 ? void 0 : _3['from']) === null || _4 === void 0 ? void 0 : _4['is_bot'],
+                                        first_name: (_6 = (_5 = res['result']) === null || _5 === void 0 ? void 0 : _5['from']) === null || _6 === void 0 ? void 0 : _6['first_name'],
+                                        last_name: (_8 = (_7 = res['result']) === null || _7 === void 0 ? void 0 : _7['from']) === null || _8 === void 0 ? void 0 : _8['last_name'],
+                                        username: (_10 = (_9 = res['result']) === null || _9 === void 0 ? void 0 : _9['from']) === null || _10 === void 0 ? void 0 : _10['username'],
+                                        language_code: (_12 = (_11 = res['result']) === null || _11 === void 0 ? void 0 : _11['from']) === null || _12 === void 0 ? void 0 : _12['language_code'],
+                                    },
+                                    location: {
+                                        longitude: (_14 = (_13 = res['result']) === null || _13 === void 0 ? void 0 : _13['location']) === null || _14 === void 0 ? void 0 : _14['longitude'],
+                                        latitude: (_16 = (_15 = res['result']) === null || _15 === void 0 ? void 0 : _15['location']) === null || _16 === void 0 ? void 0 : _16['latitude']
+                                    },
                                     text: undefined
-                                };
-                                callback(msg);
+                                });
                             }
                             else {
-                                var _ = { text: undefined };
-                                callback(_);
+                                callback({ text: undefined });
                             }
                         })];
                     case 1:
@@ -956,48 +957,41 @@ var BaleBot = /** @class */ (function (_super) {
                         }, function (res) {
                             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20;
                             if (res.ok) {
-                                var f = {
-                                    id: (_b = (_a = res['result']) === null || _a === void 0 ? void 0 : _a['from']) === null || _b === void 0 ? void 0 : _b['id'],
-                                    is_bot: (_d = (_c = res['result']) === null || _c === void 0 ? void 0 : _c['from']) === null || _d === void 0 ? void 0 : _d['is_bot'],
-                                    first_name: (_f = (_e = res['result']) === null || _e === void 0 ? void 0 : _e['from']) === null || _f === void 0 ? void 0 : _f['first_name'],
-                                    last_name: (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['from']) === null || _h === void 0 ? void 0 : _h['last_name'],
-                                    username: (_k = (_j = res['result']) === null || _j === void 0 ? void 0 : _j['from']) === null || _k === void 0 ? void 0 : _k['username'],
-                                    language_code: (_m = (_l = res['result']) === null || _l === void 0 ? void 0 : _l['from']) === null || _m === void 0 ? void 0 : _m['language_code'],
-                                };
-                                var phc = {
-                                    big_file_id: (_q = (_p = (_o = res['result']) === null || _o === void 0 ? void 0 : _o['chat']) === null || _p === void 0 ? void 0 : _p['photo']) === null || _q === void 0 ? void 0 : _q['big_file_id'],
-                                    big_file_unique_id: (_t = (_s = (_r = res['result']) === null || _r === void 0 ? void 0 : _r['chat']) === null || _s === void 0 ? void 0 : _s['photo']) === null || _t === void 0 ? void 0 : _t['big_file_unique_id'],
-                                    small_file_id: (_w = (_v = (_u = res['result']) === null || _u === void 0 ? void 0 : _u['chat']) === null || _v === void 0 ? void 0 : _v['photo']) === null || _w === void 0 ? void 0 : _w['small_file_id'],
-                                    small_file_unique_id: (_z = (_y = (_x = res['result']) === null || _x === void 0 ? void 0 : _x['chat']) === null || _y === void 0 ? void 0 : _y['photo']) === null || _z === void 0 ? void 0 : _z['small_file_unique_id'],
-                                };
-                                var c = {
-                                    id: (_1 = (_0 = res['result']) === null || _0 === void 0 ? void 0 : _0['chat']) === null || _1 === void 0 ? void 0 : _1['id'],
-                                    first_name: (_3 = (_2 = res['result']) === null || _2 === void 0 ? void 0 : _2['chat']) === null || _3 === void 0 ? void 0 : _3['first_name'],
-                                    last_name: (_5 = (_4 = res['result']) === null || _4 === void 0 ? void 0 : _4['chat']) === null || _5 === void 0 ? void 0 : _5['last_name'],
-                                    title: (_7 = (_6 = res['result']) === null || _6 === void 0 ? void 0 : _6['chat']) === null || _7 === void 0 ? void 0 : _7['title'],
-                                    type: (_9 = (_8 = res['result']) === null || _8 === void 0 ? void 0 : _8['chat']) === null || _9 === void 0 ? void 0 : _9['type'],
-                                    invite_link: (_11 = (_10 = res['result']) === null || _10 === void 0 ? void 0 : _10['chat']) === null || _11 === void 0 ? void 0 : _11['invite_link'],
-                                    photo: phc
-                                };
-                                var cont = {
-                                    first_name: (_13 = (_12 = res['result']) === null || _12 === void 0 ? void 0 : _12['contact']) === null || _13 === void 0 ? void 0 : _13['first_name'],
-                                    last_name: (_15 = (_14 = res['result']) === null || _14 === void 0 ? void 0 : _14['contact']) === null || _15 === void 0 ? void 0 : _15['last_name'],
-                                    phone_number: (_17 = (_16 = res['result']) === null || _16 === void 0 ? void 0 : _16['contact']) === null || _17 === void 0 ? void 0 : _17['phone_number'],
-                                    user_id: (_19 = (_18 = res['result']) === null || _18 === void 0 ? void 0 : _18['contact']) === null || _19 === void 0 ? void 0 : _19['user_id']
-                                };
-                                var msg = {
-                                    id: (_20 = res['result']) === null || _20 === void 0 ? void 0 : _20['message_id'],
-                                    chat: c,
-                                    from: f,
-                                    contact: cont,
+                                callback({
+                                    id: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['message_id'],
+                                    chat: {
+                                        id: (_c = (_b = res['result']) === null || _b === void 0 ? void 0 : _b['chat']) === null || _c === void 0 ? void 0 : _c['id'],
+                                        first_name: (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['chat']) === null || _e === void 0 ? void 0 : _e['first_name'],
+                                        last_name: (_g = (_f = res['result']) === null || _f === void 0 ? void 0 : _f['chat']) === null || _g === void 0 ? void 0 : _g['last_name'],
+                                        title: (_j = (_h = res['result']) === null || _h === void 0 ? void 0 : _h['chat']) === null || _j === void 0 ? void 0 : _j['title'],
+                                        type: (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['chat']) === null || _l === void 0 ? void 0 : _l['type'],
+                                        invite_link: (_o = (_m = res['result']) === null || _m === void 0 ? void 0 : _m['chat']) === null || _o === void 0 ? void 0 : _o['invite_link'],
+                                        photo: {
+                                            big_file_id: (_r = (_q = (_p = res['result']) === null || _p === void 0 ? void 0 : _p['chat']) === null || _q === void 0 ? void 0 : _q['photo']) === null || _r === void 0 ? void 0 : _r['big_file_id'],
+                                            big_file_unique_id: (_u = (_t = (_s = res['result']) === null || _s === void 0 ? void 0 : _s['chat']) === null || _t === void 0 ? void 0 : _t['photo']) === null || _u === void 0 ? void 0 : _u['big_file_unique_id'],
+                                            small_file_id: (_x = (_w = (_v = res['result']) === null || _v === void 0 ? void 0 : _v['chat']) === null || _w === void 0 ? void 0 : _w['photo']) === null || _x === void 0 ? void 0 : _x['small_file_id'],
+                                            small_file_unique_id: (_0 = (_z = (_y = res['result']) === null || _y === void 0 ? void 0 : _y['chat']) === null || _z === void 0 ? void 0 : _z['photo']) === null || _0 === void 0 ? void 0 : _0['small_file_unique_id'],
+                                        }
+                                    },
+                                    from: {
+                                        id: (_2 = (_1 = res['result']) === null || _1 === void 0 ? void 0 : _1['from']) === null || _2 === void 0 ? void 0 : _2['id'],
+                                        is_bot: (_4 = (_3 = res['result']) === null || _3 === void 0 ? void 0 : _3['from']) === null || _4 === void 0 ? void 0 : _4['is_bot'],
+                                        first_name: (_6 = (_5 = res['result']) === null || _5 === void 0 ? void 0 : _5['from']) === null || _6 === void 0 ? void 0 : _6['first_name'],
+                                        last_name: (_8 = (_7 = res['result']) === null || _7 === void 0 ? void 0 : _7['from']) === null || _8 === void 0 ? void 0 : _8['last_name'],
+                                        username: (_10 = (_9 = res['result']) === null || _9 === void 0 ? void 0 : _9['from']) === null || _10 === void 0 ? void 0 : _10['username'],
+                                        language_code: (_12 = (_11 = res['result']) === null || _11 === void 0 ? void 0 : _11['from']) === null || _12 === void 0 ? void 0 : _12['language_code'],
+                                    },
+                                    contact: {
+                                        first_name: (_14 = (_13 = res['result']) === null || _13 === void 0 ? void 0 : _13['contact']) === null || _14 === void 0 ? void 0 : _14['first_name'],
+                                        last_name: (_16 = (_15 = res['result']) === null || _15 === void 0 ? void 0 : _15['contact']) === null || _16 === void 0 ? void 0 : _16['last_name'],
+                                        phone_number: (_18 = (_17 = res['result']) === null || _17 === void 0 ? void 0 : _17['contact']) === null || _18 === void 0 ? void 0 : _18['phone_number'],
+                                        user_id: (_20 = (_19 = res['result']) === null || _19 === void 0 ? void 0 : _19['contact']) === null || _20 === void 0 ? void 0 : _20['user_id']
+                                    },
                                     text: undefined
-                                };
-                                console.log(res['result']);
-                                callback(msg);
+                                });
                             }
                             else {
-                                var _ = { text: undefined };
-                                callback(_);
+                                callback({ text: undefined });
                             }
                         })];
                     case 1:
@@ -1017,17 +1011,16 @@ var BaleBot = /** @class */ (function (_super) {
                         }, function (res) {
                             var _a, _b, _c, _d;
                             if (res.ok) {
-                                var file = {
+                                ;
+                                callback({
                                     id: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['file_id'],
                                     unique_id: (_b = res['result']) === null || _b === void 0 ? void 0 : _b['file_unique_id'],
                                     size: (_c = res['result']) === null || _c === void 0 ? void 0 : _c['file_size'],
                                     path: (_d = res['result']) === null || _d === void 0 ? void 0 : _d['file_path']
-                                };
-                                callback(file);
+                                });
                             }
                             else {
-                                var _ = {};
-                                callback(_);
+                                callback({});
                             }
                         })];
                     case 1:

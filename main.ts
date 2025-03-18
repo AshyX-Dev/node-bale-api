@@ -60,15 +60,16 @@ export class BaleBot extends EventEmitter {
         await this.request.makeConnection("getMe", {}, (res) => {
             if (callback) {
                 if (res.ok){
-                    const u: User = {
+                    callback({
                         id: res.result['id'],
                         is_bot: res.result['is_bot'],
                         first_name: res.result['first_name'],
                         last_name: res.result['last_name'],
                         username: res.result['username'],
                         language_code: res.result['language_code']
-                    }
-                    callback(u);
+                    });
+                } else {
+                    callback({});
                 }
             }
         });
@@ -111,33 +112,31 @@ export class BaleBot extends EventEmitter {
         }, (res) => {
             if (callback) {
                 if (res.ok){
-                    const phc: ChatPhoto = {
-                        big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
-                        big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
-                        small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
-                        small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
-                    };
-                    const c: Chat = {
-                        id: res.result.chat['id'],
-                        type: res.result.chat['type'],
-                        photo: phc
-                    };
-                    const f: User = {
-                        id: res.result.from['id'],
-                        is_bot: res.result.from['is_bot'],
-                        first_name: res.result.from['first_name'],
-                        last_name: res.result.from['last_name'],
-                        username: res.result.from['username'],
-                        language_code: res.result.from['language_code']
-                    };
-                    const m: MessageForm = {
+                    callback({
                         text: text,
-                        from: f,
+                        from: {
+                            id: res.result.from['id'],
+                            is_bot: res.result.from['is_bot'],
+                            first_name: res.result.from['first_name'],
+                            last_name: res.result.from['last_name'],
+                            username: res.result.from['username'],
+                            language_code: res.result.from['language_code']
+                        },
                         id: res.result['message_id'],
                         date: res.result['date'],
-                        chat: c
-                    };
-                    callback(m);
+                        chat: {
+                            id: res.result.chat['id'],
+                            type: res.result.chat['type'],
+                            photo: {
+                                big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                                big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                                small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                                small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                            }
+                        }
+                    });
+                } else {
+                    callback({text: undefined});
                 }
             }
         });
@@ -154,41 +153,44 @@ export class BaleBot extends EventEmitter {
             message_id: options.message_id
         }, (res) => {
             if (res.ok){
-                const f: User = {
-                    id: res['result']?.['from']?.['id'],
-                    is_bot: res['result']?.['from']?.['is_bot'],
-                    first_name: res['result']?.['from']?.['first_name'],
-                    last_name: res['result']?.['from']?.['last_name'],
-                    username: res['result']?.['from']?.['username'],
-                    language_code: res['result']?.['from']?.['language_code'],
-                };
-                const phc: ChatPhoto = {
-                    big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
-                    big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
-                    small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
-                    small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
-                };
-                const c: Chat = {
-                    id: res['result']?.['chat']?.['id'],
-                    first_name: res['result']?.['chat']?.['first_name'],
-                    last_name: res['result']?.['chat']?.['last_name'],
-                    title: res['result']?.['chat']?.['title'],
-                    type: res['result']?.['chat']?.['type'],
-                    invite_link: res['result']?.['chat']?.['invite_link'],
-                    photo: phc
-                };
-                const fm: MessageForm = {
+                callback({
                     id: res['result']?.['message_id'],
-                    from: f,
+                    from: {
+                        id: res['result']?.['from']?.['id'],
+                        is_bot: res['result']?.['from']?.['is_bot'],
+                        first_name: res['result']?.['from']?.['first_name'],
+                        last_name: res['result']?.['from']?.['last_name'],
+                        username: res['result']?.['from']?.['username'],
+                        language_code: res['result']?.['from']?.['language_code'],
+                    },
                     date: res['result']?.['date'],
-                    chat: c,
-                    forward_from: f,
+                    chat: {
+                        id: res['result']?.['chat']?.['id'],
+                        first_name: res['result']?.['chat']?.['first_name'],
+                        last_name: res['result']?.['chat']?.['last_name'],
+                        title: res['result']?.['chat']?.['title'],
+                        type: res['result']?.['chat']?.['type'],
+                        invite_link: res['result']?.['chat']?.['invite_link'],
+                        photo: {
+                            big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                            big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                            small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                            small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                        }
+                    },
+                    forward_from: {
+                        id: res['result']?.['from']?.['id'],
+                        is_bot: res['result']?.['from']?.['is_bot'],
+                        first_name: res['result']?.['from']?.['first_name'],
+                        last_name: res['result']?.['from']?.['last_name'],
+                        username: res['result']?.['from']?.['username'],
+                        language_code: res['result']?.['from']?.['language_code'],
+                    },
                     forward_date: res['result']?.['forward_date'],
                     text: undefined
-                };
-
-                callback(fm);
-
+                });
+            } else {
+                callback({text: undefined});
             }
         })
     }
@@ -820,46 +822,38 @@ export class BaleBot extends EventEmitter {
             reply_markup: JSON.stringify({}[options.keyboard_mode] = options.reply_markup)
         }, (res) => {
             if (res.ok){
-                const f: User = {
-                    id: res['result']?.['from']?.['id'],
-                    is_bot: res['result']?.['from']?.['is_bot'],
-                    first_name: res['result']?.['from']?.['first_name'],
-                    last_name: res['result']?.['from']?.['last_name'],
-                    username: res['result']?.['from']?.['username'],
-                    language_code: res['result']?.['from']?.['language_code'],
-                };
-
-                const phc: ChatPhoto = {
-                    big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
-                    big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
-                    small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
-                    small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
-                };
-
-                const c: Chat = {
-                    id: res['result']?.['chat']?.['id'],
-                    first_name: res['result']?.['chat']?.['first_name'],
-                    last_name: res['result']?.['chat']?.['last_name'],
-                    title: res['result']?.['chat']?.['title'],
-                    type: res['result']?.['chat']?.['type'],
-                    invite_link: res['result']?.['chat']?.['invite_link'],
-                    photo: phc
-                };
-                const location_: LocationInterface = {
-                    longitude: res['result']?.['location']?.['longitude'],
-                    latitude: res['result']?.['location']?.['latitude']
-                };
-                const msg: MessageForm = {
+                callback({
                     id: res['result']?.['message_id'],
-                    chat: c,
-                    from: f,
-                    location: location_,
+                    chat: {
+                        id: res['result']?.['chat']?.['id'],
+                        first_name: res['result']?.['chat']?.['first_name'],
+                        last_name: res['result']?.['chat']?.['last_name'],
+                        title: res['result']?.['chat']?.['title'],
+                        type: res['result']?.['chat']?.['type'],
+                        invite_link: res['result']?.['chat']?.['invite_link'],
+                        photo: {
+                            big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                            big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                            small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                            small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                        }
+                    },
+                    from: {
+                        id: res['result']?.['from']?.['id'],
+                        is_bot: res['result']?.['from']?.['is_bot'],
+                        first_name: res['result']?.['from']?.['first_name'],
+                        last_name: res['result']?.['from']?.['last_name'],
+                        username: res['result']?.['from']?.['username'],
+                        language_code: res['result']?.['from']?.['language_code'],
+                    },
+                    location: {
+                        longitude: res['result']?.['location']?.['longitude'],
+                        latitude: res['result']?.['location']?.['latitude']
+                    },
                     text: undefined
-                };
-                callback(msg);
+                });
             } else {
-                const _: MessageForm = {text: undefined};
-                callback(_);
+                callback({text: undefined});
             }
         })
     }
@@ -881,47 +875,40 @@ export class BaleBot extends EventEmitter {
             reply_markup: JSON.stringify({}[options.keyboard_mode] = options.reply_markup)
         }, (res) => {
             if (res.ok){
-                const f: User = {
-                    id: res['result']?.['from']?.['id'],
-                    is_bot: res['result']?.['from']?.['is_bot'],
-                    first_name: res['result']?.['from']?.['first_name'],
-                    last_name: res['result']?.['from']?.['last_name'],
-                    username: res['result']?.['from']?.['username'],
-                    language_code: res['result']?.['from']?.['language_code'],
-                };
-                const phc: ChatPhoto = {
-                    big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
-                    big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
-                    small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
-                    small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
-                };
-                const c: Chat = {
-                    id: res['result']?.['chat']?.['id'],
-                    first_name: res['result']?.['chat']?.['first_name'],
-                    last_name: res['result']?.['chat']?.['last_name'],
-                    title: res['result']?.['chat']?.['title'],
-                    type: res['result']?.['chat']?.['type'],
-                    invite_link: res['result']?.['chat']?.['invite_link'],
-                    photo: phc
-                };
-                const cont: ContactInterface = {
-                    first_name: res['result']?.['contact']?.['first_name'],
-                    last_name: res['result']?.['contact']?.['last_name'],
-                    phone_number: res['result']?.['contact']?.['phone_number'],
-                    user_id: res['result']?.['contact']?.['user_id']
-                };
-                const msg: MessageForm = {
+                callback({
                     id: res['result']?.['message_id'],
-                    chat: c,
-                    from: f,
-                    contact: cont,
+                    chat: {
+                        id: res['result']?.['chat']?.['id'],
+                        first_name: res['result']?.['chat']?.['first_name'],
+                        last_name: res['result']?.['chat']?.['last_name'],
+                        title: res['result']?.['chat']?.['title'],
+                        type: res['result']?.['chat']?.['type'],
+                        invite_link: res['result']?.['chat']?.['invite_link'],
+                        photo: {
+                            big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                            big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                            small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                            small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                        }
+                    },
+                    from: {
+                        id: res['result']?.['from']?.['id'],
+                        is_bot: res['result']?.['from']?.['is_bot'],
+                        first_name: res['result']?.['from']?.['first_name'],
+                        last_name: res['result']?.['from']?.['last_name'],
+                        username: res['result']?.['from']?.['username'],
+                        language_code: res['result']?.['from']?.['language_code'],
+                    },
+                    contact: {
+                        first_name: res['result']?.['contact']?.['first_name'],
+                        last_name: res['result']?.['contact']?.['last_name'],
+                        phone_number: res['result']?.['contact']?.['phone_number'],
+                        user_id: res['result']?.['contact']?.['user_id']
+                    },
                     text: undefined
-                };
-                console.log(res['result'])
-                callback(msg);
+                });
             } else {
-                const _: MessageForm = {text: undefined};
-                callback(_);
+                callback({text: undefined});
             }
         })
     }
@@ -935,17 +922,15 @@ export class BaleBot extends EventEmitter {
                 file_id: fileId
             },
             (res) => {
-                if (res.ok){
-                    const file: FileInterface = {
+                if (res.ok){;
+                    callback({
                         id: res['result']?.['file_id'],
                         unique_id: res['result']?.['file_unique_id'],
                         size: res['result']?.['file_size'],
                         path: res['result']?.['file_path']
-                    };
-                    callback(file);
+                    });
                 } else {
-                    const _: FileInterface = {};
-                    callback(_);
+                    callback({});
                 }
             }
         )
