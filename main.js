@@ -94,6 +94,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.getMe = function () {
         return __awaiter(this, arguments, void 0, function (callback) {
+            var _this = this;
             if (callback === void 0) { callback = function (user) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -111,6 +112,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({});
+                                    _this.emit("error", res.description, res.error_code);
                                 }
                             }
                         })];
@@ -123,6 +125,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.logout = function () {
         return __awaiter(this, arguments, void 0, function (callback) {
+            var _this = this;
             if (callback === void 0) { callback = function (loggingOut) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -130,6 +133,10 @@ var BaleBot = /** @class */ (function (_super) {
                             if (callback) {
                                 if (res.ok) {
                                     callback(res);
+                                }
+                                else {
+                                    callback({});
+                                    _this.emit("error", res.description, res.error_code);
                                 }
                             }
                         })];
@@ -142,6 +149,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.close = function () {
         return __awaiter(this, arguments, void 0, function (callback) {
+            var _this = this;
             if (callback === void 0) { callback = function (closing) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -149,6 +157,10 @@ var BaleBot = /** @class */ (function (_super) {
                             if (callback) {
                                 if (res.ok) {
                                     callback(res);
+                                }
+                                else {
+                                    callback({});
+                                    _this.emit("error", res.description, res.error_code);
                                 }
                             }
                         })];
@@ -162,6 +174,7 @@ var BaleBot = /** @class */ (function (_super) {
     BaleBot.prototype.sendMessage = function (chatId_1, text_1, options_1) {
         return __awaiter(this, arguments, void 0, function (chatId, text, options, callback) {
             var _, __;
+            var _this = this;
             if (callback === void 0) { callback = function (message) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -204,6 +217,7 @@ var BaleBot = /** @class */ (function (_super) {
                                     }
                                     else {
                                         callback({ text: undefined });
+                                        _this.emit("error", res.description, res.error_code);
                                     }
                                 }
                             })];
@@ -216,6 +230,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.forwardMessage = function (chatId_1, options_1) {
         return __awaiter(this, arguments, void 0, function (chatId, options, callback) {
+            var _this = this;
             if (callback === void 0) { callback = function (message) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -265,6 +280,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({ text: undefined });
+                                _this.emit("error", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -277,6 +293,7 @@ var BaleBot = /** @class */ (function (_super) {
     BaleBot.prototype.sendMedia = function (mediaOptions_1) {
         return __awaiter(this, arguments, void 0, function (mediaOptions, callback) {
             var absData, absData;
+            var _this = this;
             if (callback === void 0) { callback = function (call) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -455,8 +472,8 @@ var BaleBot = /** @class */ (function (_super) {
                                     }
                                 }
                                 else {
-                                    var _ = { text: undefined };
-                                    callback(_);
+                                    callback({ text: undefined });
+                                    _this.emit("error", res.description, res.error_code);
                                 }
                             })];
                     case 1:
@@ -662,8 +679,8 @@ var BaleBot = /** @class */ (function (_super) {
                                     }
                                 }
                                 else {
-                                    var _ = { text: undefined };
-                                    callback(_);
+                                    callback({ text: undefined });
+                                    _this.emit("error", res.description, res.error_code);
                                 }
                             })];
                     case 3:
@@ -869,8 +886,8 @@ var BaleBot = /** @class */ (function (_super) {
                                     }
                                 }
                                 else {
-                                    var _ = { text: undefined };
-                                    callback(_);
+                                    callback({ text: undefined });
+                                    _this.emit("error", res.description, res.error_code);
                                 }
                             })];
                     case 5:
@@ -883,6 +900,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.sendLocation = function (chatId_1, latitude_1, longitude_1) {
         return __awaiter(this, arguments, void 0, function (chatId, latitude, longitude, options, horizontalAccuracy, callback) {
+            var _this = this;
             if (options === void 0) { options = {}; }
             if (horizontalAccuracy === void 0) { horizontalAccuracy = null; }
             if (callback === void 0) { callback = function (location) { }; }
@@ -931,6 +949,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({ text: undefined });
+                                _this.emit("error", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -942,6 +961,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.sendContact = function (chatId_1, phoneNumber_1, firstName_1) {
         return __awaiter(this, arguments, void 0, function (chatId, phoneNumber, firstName, lastName, options, callback) {
+            var _this = this;
             if (lastName === void 0) { lastName = null; }
             if (options === void 0) { options = {}; }
             if (callback === void 0) { callback = function (clback) { }; }
@@ -992,6 +1012,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({ text: undefined });
+                                _this.emit("error", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -1003,6 +1024,7 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.getFile = function (fileId_1) {
         return __awaiter(this, arguments, void 0, function (fileId, callback) {
+            var _this = this;
             if (callback === void 0) { callback = function (file) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -1021,6 +1043,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({});
+                                _this.emit("error", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -1058,25 +1081,32 @@ var BaleBot = /** @class */ (function (_super) {
     };
     BaleBot.prototype.getChat = function (chatId_1) {
         return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
             if (callback === void 0) { callback = function (chat) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.request.makeConnection("getChat", { chat_id: chatId }, function (res) {
                             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-                            callback({
-                                first_name: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['first_name'],
-                                last_name: (_b = res['result']) === null || _b === void 0 ? void 0 : _b['last_name'],
-                                id: (_c = res['result']) === null || _c === void 0 ? void 0 : _c['id'],
-                                title: (_d = res['result']) === null || _d === void 0 ? void 0 : _d['title'],
-                                invite_link: (_e = res['result']) === null || _e === void 0 ? void 0 : _e['invite_link'],
-                                username: (_f = res['result']) === null || _f === void 0 ? void 0 : _f['username'],
-                                photo: {
-                                    big_file_id: (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['photo']) === null || _h === void 0 ? void 0 : _h['big_file_id'],
-                                    big_file_unique_id: (_k = (_j = res['result']) === null || _j === void 0 ? void 0 : _j['photo']) === null || _k === void 0 ? void 0 : _k['big_file_unique_id'],
-                                    small_file_id: (_m = (_l = res['result']) === null || _l === void 0 ? void 0 : _l['photo']) === null || _m === void 0 ? void 0 : _m['small_file_id'],
-                                    small_file_unique_id: (_p = (_o = res['result']) === null || _o === void 0 ? void 0 : _o['photo']) === null || _p === void 0 ? void 0 : _p['big_file_id'],
-                                }
-                            });
+                            if (res.ok) {
+                                callback({
+                                    first_name: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['first_name'],
+                                    last_name: (_b = res['result']) === null || _b === void 0 ? void 0 : _b['last_name'],
+                                    id: (_c = res['result']) === null || _c === void 0 ? void 0 : _c['id'],
+                                    title: (_d = res['result']) === null || _d === void 0 ? void 0 : _d['title'],
+                                    invite_link: (_e = res['result']) === null || _e === void 0 ? void 0 : _e['invite_link'],
+                                    username: (_f = res['result']) === null || _f === void 0 ? void 0 : _f['username'],
+                                    photo: {
+                                        big_file_id: (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['photo']) === null || _h === void 0 ? void 0 : _h['big_file_id'],
+                                        big_file_unique_id: (_k = (_j = res['result']) === null || _j === void 0 ? void 0 : _j['photo']) === null || _k === void 0 ? void 0 : _k['big_file_unique_id'],
+                                        small_file_id: (_m = (_l = res['result']) === null || _l === void 0 ? void 0 : _l['photo']) === null || _m === void 0 ? void 0 : _m['small_file_id'],
+                                        small_file_unique_id: (_p = (_o = res['result']) === null || _o === void 0 ? void 0 : _o['photo']) === null || _p === void 0 ? void 0 : _p['big_file_id'],
+                                    }
+                                });
+                            }
+                            else {
+                                callback({});
+                                _this.emit("error", res.description, res.error_code);
+                            }
                         })];
                     case 1:
                         _a.sent();
@@ -1372,7 +1402,7 @@ var BaleBot = /** @class */ (function (_super) {
     return BaleBot;
 }(events_1.EventEmitter));
 exports.BaleBot = BaleBot;
-// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling: true, polling_interval: 1000});
+// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling: false, polling_interval: 1000});
 // b.getChat(
 //     554324725,
 //     (data) => {

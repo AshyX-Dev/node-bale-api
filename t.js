@@ -14,29 +14,34 @@
 //   console.log("a is not a plain object.");
 // }
 
-const fs = require('fs');
+// const fs = require('fs');
 
-// Create a writable stream
-const stream = fs.createWriteStream('output.png');
+// // Create a writable stream
+// const stream = fs.createWriteStream('output.png');
 
-// Example binary data (replace with your actual data)
-const data = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]); // PNG header
+// // Example binary data (replace with your actual data)
+// const data = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]); // PNG header
 
-// Write data to the stream
-stream.write(data, (err) => {
-    if (err) {
-        console.error('Error writing data:', err);
-    } else {
-        console.log('Data written successfully');
-    }
-});
+// // Write data to the stream
+// stream.write(data, (err) => {
+//     if (err) {
+//         console.error('Error writing data:', err);
+//     } else {
+//         console.log('Data written successfully');
+//     }
+// });
 
-// End the stream
-stream.end(() => {
-    console.log('Stream closed');
-});
+// // End the stream
+// stream.end(() => {
+//     console.log('Stream closed');
+// });
 
-// Handle stream errors
-stream.on('error', (err) => {
-    console.error('Stream error:', err);
-});
+// // Handle stream errors
+// stream.on('error', (err) => {
+//     console.error('Stream error:', err);
+// });
+
+const { EventEmitter } = require("events");
+
+const event = new EventEmitter();
+event.emit("a", "hi")

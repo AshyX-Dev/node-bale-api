@@ -24,7 +24,8 @@ interface events {
     voice: (message: MessageForm) => void,
     sticker: (message: MessageForm) => void,
     document: (message: MessageForm) => void,
-    close: () => void
+    close: () => void,
+    error: (error_message: string, error_code: number) => void
 }
 
 export class BaleBot extends EventEmitter {
@@ -70,6 +71,7 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({});
+                    this.emit("error", res.description, res.error_code);
                 }
             }
         });
@@ -80,6 +82,9 @@ export class BaleBot extends EventEmitter {
             if (callback) {
                 if (res.ok){
                     callback(res);
+                } else {
+                    callback({});
+                    this.emit("error", res.description, res.error_code);
                 }
             }
         });
@@ -90,6 +95,9 @@ export class BaleBot extends EventEmitter {
             if (callback) {
                 if (res.ok){
                     callback(res);
+                } else {
+                    callback({});
+                    this.emit("error", res.description, res.error_code);
                 }
             }
         });
@@ -137,6 +145,7 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({text: undefined});
+                    this.emit("error", res.description, res.error_code);
                 }
             }
         });
@@ -191,6 +200,7 @@ export class BaleBot extends EventEmitter {
                 });
             } else {
                 callback({text: undefined});
+                this.emit("error", res.description, res.error_code);
             }
         })
     }
@@ -377,8 +387,8 @@ export class BaleBot extends EventEmitter {
                             callback(ancb);
                         }
                     } else {
-                        let _: MessageForm = {text: undefined};
-                        callback(_);
+                        callback({text: undefined});
+                        this.emit("error", res.description, res.error_code);
                     }
                 }
             )
@@ -588,8 +598,8 @@ export class BaleBot extends EventEmitter {
                         callback(ancb);
                     }
                 } else {
-                    let _: MessageForm = {text: undefined};
-                    callback(_);
+                    callback({text: undefined});
+                    this.emit("error", res.description, res.error_code);
                 }
             });
         } else if (mediaOptions.file_id !== undefined && this.file_id_regex.test(mediaOptions.file_id)) {
@@ -798,8 +808,8 @@ export class BaleBot extends EventEmitter {
                         callback(ancb);
                     }
                 } else {
-                    let _: MessageForm = {text: undefined};
-                    callback(_);
+                    callback({text: undefined});
+                    this.emit("error", res.description, res.error_code);
                 }
             });
         }
@@ -854,6 +864,7 @@ export class BaleBot extends EventEmitter {
                 });
             } else {
                 callback({text: undefined});
+                this.emit("error", res.description, res.error_code);
             }
         })
     }
@@ -909,6 +920,7 @@ export class BaleBot extends EventEmitter {
                 });
             } else {
                 callback({text: undefined});
+                this.emit("error", res.description, res.error_code);
             }
         })
     }
@@ -931,6 +943,7 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({});
+                    this.emit("error", res.description, res.error_code);
                 }
             }
         )
@@ -962,20 +975,25 @@ export class BaleBot extends EventEmitter {
         await this.request.makeConnection(
             "getChat", { chat_id: chatId },
             (res) => {
-                callback({
-                    first_name: res['result']?.['first_name'],
-                    last_name: res['result']?.['last_name'],
-                    id: res['result']?.['id'],
-                    title: res['result']?.['title'],
-                    invite_link: res['result']?.['invite_link'],
-                    username: res['result']?.['username'],
-                    photo: {
-                        big_file_id: res['result']?.['photo']?.['big_file_id'],
-                        big_file_unique_id: res['result']?.['photo']?.['big_file_unique_id'],
-                        small_file_id: res['result']?.['photo']?.['small_file_id'],
-                        small_file_unique_id: res['result']?.['photo']?.['big_file_id'],
-                    }
-                });
+                if (res.ok){
+                    callback({
+                        first_name: res['result']?.['first_name'],
+                        last_name: res['result']?.['last_name'],
+                        id: res['result']?.['id'],
+                        title: res['result']?.['title'],
+                        invite_link: res['result']?.['invite_link'],
+                        username: res['result']?.['username'],
+                        photo: {
+                            big_file_id: res['result']?.['photo']?.['big_file_id'],
+                            big_file_unique_id: res['result']?.['photo']?.['big_file_unique_id'],
+                            small_file_id: res['result']?.['photo']?.['small_file_id'],
+                            small_file_unique_id: res['result']?.['photo']?.['big_file_id'],
+                        }
+                    });
+                } else {
+                    callback({});
+                    this.emit("error", res.description, res.error_code);
+                }
             }
         )
     }
@@ -1243,7 +1261,7 @@ export class BaleBot extends EventEmitter {
 
 }
 
-// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling: true, polling_interval: 1000});
+// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling: false, polling_interval: 1000});
 
 // b.getChat(
 //     554324725,
