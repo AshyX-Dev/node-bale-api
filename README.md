@@ -1,8 +1,9 @@
 # Node Bale API
 + [Github Page is Here ! 👥🍷](https://github.com/AshyX-Dev/node-bale-api)
+
 ## Usage
 + polling: boolean => create a interval
-+ polling_interval: number => a ms time to make a request
++ polling_interval: number => a ms time to make a request for polling
 
 ```javascript 
 const token = "...";
