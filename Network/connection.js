@@ -82,7 +82,7 @@ var Connection = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         e_1 = _a.sent();
-                        callback({ ok: false, local_error: e_1 });
+                        callback({ ok: false, message: e_1 });
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }
@@ -136,6 +136,105 @@ var Connection = /** @class */ (function () {
             });
         });
     };
+    Connection.prototype.setChatPhoto = function (path_2, chatId_1) {
+        return __awaiter(this, arguments, void 0, function (path, chatId, callback) {
+            var fileStream, formData, error_2;
+            if (callback === void 0) { callback = function (data) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        fileStream = (0, fs_1.createReadStream)(path);
+                        formData = new FormData();
+                        formData.append("chat_id", chatId.toString());
+                        formData.append("photo", fileStream, (0, path_1.basename)(path));
+                        return [4 /*yield*/, axios.post("https://tapi.bale.ai/bot".concat(this.token, "/setChatPhoto"), formData, {
+                                headers: __assign({}, formData.getHeaders()),
+                            }).then(function (resp) {
+                                callback(resp.data);
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_2 = _a.sent();
+                        callback({
+                            ok: false,
+                            message: error_2
+                        });
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /* Beta */
+    Connection.prototype.uploadSticker = function (path_2, userId_1) {
+        return __awaiter(this, arguments, void 0, function (path, userId, callback) {
+            var fileStream, formData, error_3;
+            if (callback === void 0) { callback = function (data) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        fileStream = (0, fs_1.createReadStream)(path);
+                        formData = new FormData();
+                        formData.append("user_id", userId.toString());
+                        formData.append("sticker", fileStream, (0, path_1.basename)(path));
+                        return [4 /*yield*/, axios.post("https://tapi.bale.ai/bot".concat(this.token, "/uploadStickerFile"), formData, {
+                                headers: __assign({}, formData.getHeaders()),
+                            }).then(function (resp) {
+                                callback(resp.data);
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_3 = _a.sent();
+                        callback({
+                            ok: false,
+                            message: error_3
+                        });
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /* Beta */
+    Connection.prototype.uploadStickerToSet = function (path_2, userId_1, setName_1) {
+        return __awaiter(this, arguments, void 0, function (path, userId, setName, callback) {
+            var fileStream, formData, error_4;
+            if (callback === void 0) { callback = function (data) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        fileStream = (0, fs_1.createReadStream)(path);
+                        formData = new FormData();
+                        formData.append("user_id", userId.toString());
+                        formData.append("name", setName);
+                        formData.append("sticker", fileStream, (0, path_1.basename)(path));
+                        return [4 /*yield*/, axios.post("https://tapi.bale.ai/bot".concat(this.token, "/addStickerToSet"), formData, {
+                                headers: __assign({}, formData.getHeaders()),
+                            }).then(function (resp) {
+                                callback(resp.data);
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_4 = _a.sent();
+                        callback({
+                            ok: false,
+                            message: error_4
+                        });
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     Connection.prototype.fileConnection = function (filePath_1) {
         return __awaiter(this, arguments, void 0, function (filePath, callback) {
             var url, _, res, e_2;
@@ -160,7 +259,7 @@ var Connection = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         e_2 = _a.sent();
-                        callback({ ok: false, local_error: e_2 });
+                        callback({ ok: false, message: e_2 });
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
                 }

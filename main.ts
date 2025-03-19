@@ -1,18 +1,11 @@
-// write callback of SendMessage carefully ( handle photo )
-
-import { existsSync, createReadStream, createWriteStream, readSync, readFileSync, writeFile, writeFileSync } from 'fs';
-import { Readable } from 'stream';
-import { basename } from 'path';
+import { existsSync } from 'fs';
 import { EventEmitter } from 'events';
 import { Connection } from "./Network/connection";
 import {
-    chatTypes, stickerTypes, MessageTypes, InlineKeyboard, ReplyKeyboard, medias,
-    MaskText,
-    User, Chat, ChatPhoto, PhotoSizeInterface, PhotoCallback, reWrite,
-    SendMessageOptions, ConstructorOptions, ForwardOptions, MediaOptions, MediaUpload,
+    Promotion, MaskText, User, Chat, ChatPhoto, PhotoSizeInterface, reWrite, editMessageTextOptions,
+    SendMessageOptions, ConstructorOptions, ForwardOptions, MediaUpload, newInviteLink,
     AnimationInterface, AudioInterface, DocumentLikeInterface, VideoInterface,
-    VoiceInterface, ContactInterface, ContactArray, LocationInterface, FileInterface,
-    StickerInterface, StickerSetInterface, Invoice, CallbackQuery, MessageForm,
+    VoiceInterface, FileInterface, StickerInterface, CallbackQuery, MessageForm,
 } from "./Objects/interfaces";
 
 interface events {
@@ -24,8 +17,8 @@ interface events {
     voice: (message: MessageForm) => void,
     sticker: (message: MessageForm) => void,
     document: (message: MessageForm) => void,
-    close: () => void,
-    error: (error_message: string, error_code: number) => void
+    fumble: (error_message: string, error_code: number) => void,
+    close: () => void
 }
 
 export class BaleBot extends EventEmitter {
@@ -71,7 +64,7 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             }
         });
@@ -84,7 +77,7 @@ export class BaleBot extends EventEmitter {
                     callback(res);
                 } else {
                     callback({});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             }
         });
@@ -97,7 +90,7 @@ export class BaleBot extends EventEmitter {
                     callback(res);
                 } else {
                     callback({});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             }
         });
@@ -106,7 +99,7 @@ export class BaleBot extends EventEmitter {
     async sendMessage(
         chatId: number,
         text: string,
-        options: SendMessageOptions,
+        options: SendMessageOptions = {},
         callback: (message: MessageForm) => void = (message) => {}
     ){
         var _ = options.keyboard_mode;
@@ -145,7 +138,7 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({text: undefined});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             }
         });
@@ -200,7 +193,7 @@ export class BaleBot extends EventEmitter {
                 });
             } else {
                 callback({text: undefined});
-                this.emit("error", res.description, res.error_code);
+                this.emit("fumble", res.description, res.error_code);
             }
         })
     }
@@ -388,7 +381,7 @@ export class BaleBot extends EventEmitter {
                         }
                     } else {
                         callback({text: undefined});
-                        this.emit("error", res.description, res.error_code);
+                        this.emit("fumble", res.description, res.error_code);
                     }
                 }
             )
@@ -599,7 +592,7 @@ export class BaleBot extends EventEmitter {
                     }
                 } else {
                     callback({text: undefined});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             });
         } else if (mediaOptions.file_id !== undefined && this.file_id_regex.test(mediaOptions.file_id)) {
@@ -809,7 +802,7 @@ export class BaleBot extends EventEmitter {
                     }
                 } else {
                     callback({text: undefined});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             });
         }
@@ -864,7 +857,7 @@ export class BaleBot extends EventEmitter {
                 });
             } else {
                 callback({text: undefined});
-                this.emit("error", res.description, res.error_code);
+                this.emit("fumble", res.description, res.error_code);
             }
         })
     }
@@ -920,7 +913,7 @@ export class BaleBot extends EventEmitter {
                 });
             } else {
                 callback({text: undefined});
-                this.emit("error", res.description, res.error_code);
+                this.emit("fumble", res.description, res.error_code);
             }
         })
     }
@@ -943,7 +936,7 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             }
         )
@@ -957,7 +950,7 @@ export class BaleBot extends EventEmitter {
             if (typeof s === 'object' && s !== null && !Array.isArray(s)) {
                 callback({
                     ok: false,
-                    error_message: s['local_error']
+                    error_message: s['message']
                 });
             } else {
                 callback({
@@ -992,10 +985,492 @@ export class BaleBot extends EventEmitter {
                     });
                 } else {
                     callback({});
-                    this.emit("error", res.description, res.error_code);
+                    this.emit("fumble", res.description, res.error_code);
                 }
             }
         )
+    }
+
+    async pinMessage(
+        chatId: number,
+        messageId: number,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("pinChatMessage", {
+            chat_id: chatId,
+            message_id: messageId
+        }, (res) => {
+            if (res.ok){
+                callback(res.result)
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async unpinMessage(
+        chatId: number,
+        messageId: number,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("unpinChatMessage", {
+            chat_id: chatId,
+            message_id: messageId
+        }, (res) => {
+            if (res.ok){
+                callback(res.result)
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async unpinAllMessage(
+        chatId: number,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("unpinAllChatMessages", {
+            chat_id: chatId,
+        }, (res) => {
+            if (res.ok){
+                callback(res.result)
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async editMessageText(
+        chatId: number,
+        text: string,
+        messageId: number,
+        options: editMessageTextOptions = {},
+        callback: (clback: MessageForm) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("editMessageText", {
+            chat_id: chatId,
+            text: text,
+            message_id: messageId,
+            reply_markup: JSON.stringify({}[options.keyboard_mode]=options.reply_markup)
+        }, (res) => {
+            if (res.ok){
+                callback({
+                    text: undefined,
+                    id: res['result']?.['message_id'],
+                    date: res['result']?.['date'],
+                    edit_date: res['result']?.['edit_date'],
+                    chat: {
+                        id: res['result']?.['chat']?.['id'],
+                        type: res['result']?.['chat']?.['type'],
+                        photo: {
+                            big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                            big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                            small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                            small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id']
+                        }
+                    }
+                });
+            } else {
+                callback({text: undefined});
+                this.emit("fumble", res.description, res.error_code)
+            }
+        })
+    }
+
+    async createInviteLink(
+        chatId: number,
+        callback: (clback: newInviteLink) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("createChatInviteLink",
+            {
+                chat_id: chatId
+            }, (res) => {
+                if (res.ok){
+                    callback({
+                        invite_link: res['result']?.['invite_link'],
+                        creator: {
+                            id: res['result']?.['creator']?.['id'],
+                            is_bot: res['result']?.['creator']?.['is_bot'],
+                            first_name: res['result']?.['creator']?.['first_name'],
+                            username: res['result']?.['creator']?.['username'],
+                            last_name: res['result']?.['creator']?.['last_name']
+                        },
+                        creates_join_request: res['result']?.['creates_join_request'],
+                        is_primary: res['result']?.['is_primary'],
+                        is_revoked: res['result']?.['is_revoked'],
+                        name: res['result']?.['name'],
+                        expire_date: res['result']?.['expire_date'],
+                        member_limit: res['result']?.['member_limit'],
+                        pending_join_request_count: res['result']?.['pending_join_request_count']
+                    });
+                } else {
+                    callback({});
+                    this.emit("fumble", res.description, res.error_code);
+                }
+            }
+        )
+    }
+
+    async revokeInviteLink(
+        chatId: number,
+        previousInviteLink: string,
+        callback: (clback: newInviteLink) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("revokeChatInviteLink", {
+            chat_id: chatId,
+            invite_link: previousInviteLink
+        }, (res) => {
+            if (res.ok){
+                callback({
+                    invite_link: res['result']?.['invite_link'],
+                    creator: {
+                        id: res['result']?.['creator']?.['id'],
+                        is_bot: res['result']?.['creator']?.['is_bot'],
+                        first_name: res['result']?.['creator']?.['first_name'],
+                        username: res['result']?.['creator']?.['username'],
+                        last_name: res['result']?.['creator']?.['last_name']
+                    },
+                    creates_join_request: res['result']?.['creates_join_request'],
+                    is_primary: res['result']?.['is_primary'],
+                    is_revoked: res['result']?.['is_revoked'],
+                    name: res['result']?.['name'],
+                    expire_date: res['result']?.['expire_date'],
+                    member_limit: res['result']?.['member_limit'],
+                    pending_join_request_count: res['result']?.['pending_join_request_count']
+                });
+            } else {
+                callback({});
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async exportInviteLink(
+        chatId: number,
+        callback: (clback: string | undefined) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("exportChatInviteLink", {
+            chat_id: chatId
+        }, (res) => {
+            if (res.ok){
+                callback(res['result']);
+            } else {
+                callback(undefined);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async deleteMessage(
+        chatId: number,
+        messageId: number[] | number,
+        callback: (clback: boolean | any) => void = (clback) => {}
+    ){
+        if (typeof messageId == "number"){
+            await this.request.makeConnection("deleteMessage", {
+                chat_id: chatId,
+                message_id: messageId
+            }, (res) => {
+                if (res.ok){
+                    callback(res.result);
+                } else {
+                    callback(false);
+                    this.emit("fumble", res.description, res.error_code);
+                }
+            })
+        } else if (Array.isArray(messageId)){
+            const msgids = {};
+            for (let mid of messageId){
+                await this.request.makeConnection("deleteMessage", {
+                    chat_id: chatId,
+                    message_id: mid
+                }, (res) => {
+                    if (res.ok){
+                        Object.defineProperty(msgids, mid, {
+                            value: res.result,
+                            enumerable: true,
+                            configurable: true,
+                            writable: true
+                        });
+
+                    } else {
+                        Object.defineProperty(msgids, mid, {
+                            value: false,
+                            enumerable: true,
+                            configurable: true,
+                            writable: true
+                        });
+                        this.emit("fumble", res.description, res.error_code);
+                    }
+                })
+            }
+            callback(msgids);
+        }
+    }
+
+    async createNewStickerSet(
+        userId: number,
+        name: string,
+        title: string,
+        sticker: StickerInterface[] | any[],
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("createNewStickerSet", {
+            user_id: userId,
+            name: name,
+            title: title,
+            sticker: sticker
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async banChatMember(
+        chatId: number,
+        userId: number,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("banChatMember", {
+            chat_id: chatId,
+            user_id: userId
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async unbanChatMember(
+        chatId: number,
+        userId: number,
+        onlyIfBanned: boolean | null = true,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("unbanChatMember", {
+            chat_id: chatId,
+            user_id: userId,
+            only_if_banned: onlyIfBanned
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    /**
+     * 
+     * @param chatId 
+     * @param userId 
+     * @param promotion 
+     * @param callback 
+     * @abstract Says chat id is empty, after fixing the servers, we will fix this method
+     */
+    async promoteChatMember(
+        chatId: number,
+        userId: number,
+        promotion: Promotion = {},
+        callback: (clback: any) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("promoteChatMember", {
+            chat_id: chatId,
+            user_id: userId,
+            can_change_info: promotion.can_change_info,
+            can_post_messages: promotion.can_post_messages,
+            can_edit_messages: promotion.can_edit_messages,
+            can_delete_messages: promotion.can_delete_messages,
+            can_manage_video_chats: promotion.can_manage_video_chats,
+            can_invite_users: promotion.can_invite_users,
+            can_restrict_members: promotion.can_restrict_members
+        }, (res) => {
+            if (res.ok){
+                callback(res);
+            } else {
+                callback(res);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    /**
+     * 
+     * @param chatId 
+     * @param photo 
+     * @param callback 
+     * @abstract Says Internal server error, after fixing the servers, we will fix this method
+     */
+    async setChatPhoto(
+        chatId: number,
+        photo: string,
+        callback: (clback: any) => void = (clback) => {}
+    ){
+        if (this.link_url_regex.test(photo)){
+            await this.request.makeConnection("setChatPhoto", {
+                chat_id: chatId,
+                photo: photo
+            }, (res) => {
+                if (res.ok){
+                    callback(res);
+                } else {
+                    callback(res);
+                    this.emit("fumble", res.description, res.error_code);
+                }
+            })
+        } else if (existsSync(photo)) {
+            await this.request.setChatPhoto(photo, chatId, (res) => {
+                if (res.ok){
+                    callback(res);
+                } else {
+                    callback(res);
+                    this.emit("fumble", res.description, res.error_code);
+                }
+            })
+        }
+    }
+
+    async leaveChat(
+        chatId: number,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("leaveChat", {
+            chat_id: chatId
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async setChatTitle(
+        chatId: number,
+        title: string,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("setChatTitle", {
+            chat_id: chatId,
+            title: title
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async setChatDescription(
+        chatId: number,
+        description: string,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("setChatDescription", {
+            chat_id: chatId,
+            description: description
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async deleteChatPhoto(
+        chatId: number,
+        callback: (clback: boolean) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("deleteChatPhoto", {
+            chat_id: chatId
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(false);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async getChatMembersCount(
+        chatId: number,
+        callback: (clback: number) => void = (clback) => {}
+    ){
+        await this.request.makeConnection("getChatMembersCount", {
+            chat_id: chatId
+        }, (res) => {
+            if (res.ok){
+                callback(res.result);
+            } else {
+                callback(-1);
+                this.emit("fumble", res.description, res.error_code);
+            }
+        })
+    }
+
+    async replyTo(
+        message: MessageForm,
+        text: string,
+        options: SendMessageOptions = {},
+        callback: (message: MessageForm) => void = (message) => {}
+    ){
+        var _ = options.keyboard_mode;
+        var __ = {};
+        __[_] = options.reply_markup;
+        await this.request.makeConnection("sendMessage", {
+            chat_id: message.chat.id,
+            text: text,
+            reply_to_message_id: message.id,
+            reply_markup: JSON.stringify(__)
+        }, (res) => {
+            if (callback) {
+                if (res.ok){
+                    callback({
+                        text: text,
+                        from: {
+                            id: res.result.from['id'],
+                            is_bot: res.result.from['is_bot'],
+                            first_name: res.result.from['first_name'],
+                            last_name: res.result.from['last_name'],
+                            username: res.result.from['username'],
+                            language_code: res.result.from['language_code']
+                        },
+                        id: res.result['message_id'],
+                        date: res.result['date'],
+                        chat: {
+                            id: res.result.chat['id'],
+                            type: res.result.chat['type'],
+                            photo: {
+                                big_file_id: res['result']?.['chat']?.['photo']?.['big_file_id'],
+                                big_file_unique_id: res['result']?.['chat']?.['photo']?.['big_file_unique_id'],
+                                small_file_id: res['result']?.['chat']?.['photo']?.['small_file_id'],
+                                small_file_unique_id: res['result']?.['chat']?.['photo']?.['small_file_unique_id'],
+                            }
+                        }
+                    });
+                } else {
+                    callback({text: undefined});
+                    this.emit("fumble", res.description, res.error_code);
+                }
+            }
+        });
     }
 
     async poll(intervalTime: number | undefined){  
@@ -1258,75 +1733,7 @@ export class BaleBot extends EventEmitter {
         }, intervalTime ?? this.time)
         this.intervalId = interval;
     }
-
 }
 
-// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling: false, polling_interval: 1000});
 
-// b.getChat(
-//     554324725,
-//     (data) => {
-//         console.log(data)
-//     }
-// )
-
-// b.sendMedia(
-//     {
-//         media: "video",
-//         path: "./movie.mp4",
-//         chat_id: 554324725,
-//     },
-//     (data) => {
-//         console.log(data)
-//     }
-// )
-// b.getFileContent("1541141536:8796073695150022400:1:c40e1ca80d6f476b4c174c1f29cc90d5", (re) => {
-//     console.log(re.data)
-// })
-// b.getFile(
-//     "1541141536:6198042179158220547:1:19072fd85f4cd4b9",
-//     (data) => {
-//         console.log(data)
-//     }
-// )
-// b.sendPhoto(
-//     554324725,
-//     "I:\\ws2.png",
-//     {
-//         reply_markup: [
-//             [
-//                 {
-//                     text: "KO",
-//                     request_contact: true
-//                 }
-//             ]
-//         ]
-//     },
-//     (msg) => { console.log(msg.photo) }
-// )
-
-
-// b.sendPhoto(
-//     554324725,
-//     "https://avatars.githubusercontent.com/u/196440184?v=4",
-//     {
-//         reply_markup: [
-//             [
-//                 {
-//                     text: "KO",
-//                     request_contact: true
-//                 }
-//             ]
-//         ]
-//     },
-//     (msg) => { console.log(msg.photo) }
-// )
-
-// b.sendMessage(
-//     554324725,
-//     "hi",
-//     {},
-//     (c) => { console.log(c) }
-// )
-
-module.exports = { BaleBot };
+module.exports = { BaleBot, MaskText };

@@ -1,5 +1,4 @@
 "use strict";
-// write callback of SendMessage carefully ( handle photo )
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -65,6 +64,7 @@ exports.BaleBot = void 0;
 var fs_1 = require("fs");
 var events_1 = require("events");
 var connection_1 = require("./Network/connection");
+var interfaces_1 = require("./Objects/interfaces");
 var BaleBot = /** @class */ (function (_super) {
     __extends(BaleBot, _super);
     function BaleBot(BotToken, options) {
@@ -112,7 +112,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({});
-                                    _this.emit("error", res.description, res.error_code);
+                                    _this.emit("fumble", res.description, res.error_code);
                                 }
                             }
                         })];
@@ -136,7 +136,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({});
-                                    _this.emit("error", res.description, res.error_code);
+                                    _this.emit("fumble", res.description, res.error_code);
                                 }
                             }
                         })];
@@ -160,7 +160,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({});
-                                    _this.emit("error", res.description, res.error_code);
+                                    _this.emit("fumble", res.description, res.error_code);
                                 }
                             }
                         })];
@@ -171,10 +171,11 @@ var BaleBot = /** @class */ (function (_super) {
             });
         });
     };
-    BaleBot.prototype.sendMessage = function (chatId_1, text_1, options_1) {
+    BaleBot.prototype.sendMessage = function (chatId_1, text_1) {
         return __awaiter(this, arguments, void 0, function (chatId, text, options, callback) {
             var _, __;
             var _this = this;
+            if (options === void 0) { options = {}; }
             if (callback === void 0) { callback = function (message) { }; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -217,7 +218,7 @@ var BaleBot = /** @class */ (function (_super) {
                                     }
                                     else {
                                         callback({ text: undefined });
-                                        _this.emit("error", res.description, res.error_code);
+                                        _this.emit("fumble", res.description, res.error_code);
                                     }
                                 }
                             })];
@@ -280,7 +281,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({ text: undefined });
-                                _this.emit("error", res.description, res.error_code);
+                                _this.emit("fumble", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -473,7 +474,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({ text: undefined });
-                                    _this.emit("error", res.description, res.error_code);
+                                    _this.emit("fumble", res.description, res.error_code);
                                 }
                             })];
                     case 1:
@@ -680,7 +681,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({ text: undefined });
-                                    _this.emit("error", res.description, res.error_code);
+                                    _this.emit("fumble", res.description, res.error_code);
                                 }
                             })];
                     case 3:
@@ -887,7 +888,7 @@ var BaleBot = /** @class */ (function (_super) {
                                 }
                                 else {
                                     callback({ text: undefined });
-                                    _this.emit("error", res.description, res.error_code);
+                                    _this.emit("fumble", res.description, res.error_code);
                                 }
                             })];
                     case 5:
@@ -949,7 +950,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({ text: undefined });
-                                _this.emit("error", res.description, res.error_code);
+                                _this.emit("fumble", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -1012,7 +1013,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({ text: undefined });
-                                _this.emit("error", res.description, res.error_code);
+                                _this.emit("fumble", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -1043,7 +1044,7 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({});
-                                _this.emit("error", res.description, res.error_code);
+                                _this.emit("fumble", res.description, res.error_code);
                             }
                         })];
                     case 1:
@@ -1062,7 +1063,7 @@ var BaleBot = /** @class */ (function (_super) {
                             if (typeof s === 'object' && s !== null && !Array.isArray(s)) {
                                 callback({
                                     ok: false,
-                                    error_message: s['local_error']
+                                    error_message: s['message']
                                 });
                             }
                             else {
@@ -1105,9 +1106,662 @@ var BaleBot = /** @class */ (function (_super) {
                             }
                             else {
                                 callback({});
-                                _this.emit("error", res.description, res.error_code);
+                                _this.emit("fumble", res.description, res.error_code);
                             }
                         })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.pinMessage = function (chatId_1, messageId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, messageId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("pinChatMessage", {
+                            chat_id: chatId,
+                            message_id: messageId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.unpinMessage = function (chatId_1, messageId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, messageId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("unpinChatMessage", {
+                            chat_id: chatId,
+                            message_id: messageId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.unpinAllMessage = function (chatId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("unpinAllChatMessages", {
+                            chat_id: chatId,
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.editMessageText = function (chatId_1, text_1, messageId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, text, messageId, options, callback) {
+            var _this = this;
+            if (options === void 0) { options = {}; }
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("editMessageText", {
+                            chat_id: chatId,
+                            text: text,
+                            message_id: messageId,
+                            reply_markup: JSON.stringify({}[options.keyboard_mode] = options.reply_markup)
+                        }, function (res) {
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u;
+                            if (res.ok) {
+                                callback({
+                                    text: undefined,
+                                    id: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['message_id'],
+                                    date: (_b = res['result']) === null || _b === void 0 ? void 0 : _b['date'],
+                                    edit_date: (_c = res['result']) === null || _c === void 0 ? void 0 : _c['edit_date'],
+                                    chat: {
+                                        id: (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['chat']) === null || _e === void 0 ? void 0 : _e['id'],
+                                        type: (_g = (_f = res['result']) === null || _f === void 0 ? void 0 : _f['chat']) === null || _g === void 0 ? void 0 : _g['type'],
+                                        photo: {
+                                            big_file_id: (_k = (_j = (_h = res['result']) === null || _h === void 0 ? void 0 : _h['chat']) === null || _j === void 0 ? void 0 : _j['photo']) === null || _k === void 0 ? void 0 : _k['big_file_id'],
+                                            big_file_unique_id: (_o = (_m = (_l = res['result']) === null || _l === void 0 ? void 0 : _l['chat']) === null || _m === void 0 ? void 0 : _m['photo']) === null || _o === void 0 ? void 0 : _o['big_file_unique_id'],
+                                            small_file_id: (_r = (_q = (_p = res['result']) === null || _p === void 0 ? void 0 : _p['chat']) === null || _q === void 0 ? void 0 : _q['photo']) === null || _r === void 0 ? void 0 : _r['small_file_id'],
+                                            small_file_unique_id: (_u = (_t = (_s = res['result']) === null || _s === void 0 ? void 0 : _s['chat']) === null || _t === void 0 ? void 0 : _t['photo']) === null || _u === void 0 ? void 0 : _u['small_file_unique_id']
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                callback({ text: undefined });
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.createInviteLink = function (chatId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("createChatInviteLink", {
+                            chat_id: chatId
+                        }, function (res) {
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+                            if (res.ok) {
+                                callback({
+                                    invite_link: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['invite_link'],
+                                    creator: {
+                                        id: (_c = (_b = res['result']) === null || _b === void 0 ? void 0 : _b['creator']) === null || _c === void 0 ? void 0 : _c['id'],
+                                        is_bot: (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['creator']) === null || _e === void 0 ? void 0 : _e['is_bot'],
+                                        first_name: (_g = (_f = res['result']) === null || _f === void 0 ? void 0 : _f['creator']) === null || _g === void 0 ? void 0 : _g['first_name'],
+                                        username: (_j = (_h = res['result']) === null || _h === void 0 ? void 0 : _h['creator']) === null || _j === void 0 ? void 0 : _j['username'],
+                                        last_name: (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['creator']) === null || _l === void 0 ? void 0 : _l['last_name']
+                                    },
+                                    creates_join_request: (_m = res['result']) === null || _m === void 0 ? void 0 : _m['creates_join_request'],
+                                    is_primary: (_o = res['result']) === null || _o === void 0 ? void 0 : _o['is_primary'],
+                                    is_revoked: (_p = res['result']) === null || _p === void 0 ? void 0 : _p['is_revoked'],
+                                    name: (_q = res['result']) === null || _q === void 0 ? void 0 : _q['name'],
+                                    expire_date: (_r = res['result']) === null || _r === void 0 ? void 0 : _r['expire_date'],
+                                    member_limit: (_s = res['result']) === null || _s === void 0 ? void 0 : _s['member_limit'],
+                                    pending_join_request_count: (_t = res['result']) === null || _t === void 0 ? void 0 : _t['pending_join_request_count']
+                                });
+                            }
+                            else {
+                                callback({});
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.revokeInviteLink = function (chatId_1, previousInviteLink_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, previousInviteLink, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("revokeChatInviteLink", {
+                            chat_id: chatId,
+                            invite_link: previousInviteLink
+                        }, function (res) {
+                            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+                            if (res.ok) {
+                                callback({
+                                    invite_link: (_a = res['result']) === null || _a === void 0 ? void 0 : _a['invite_link'],
+                                    creator: {
+                                        id: (_c = (_b = res['result']) === null || _b === void 0 ? void 0 : _b['creator']) === null || _c === void 0 ? void 0 : _c['id'],
+                                        is_bot: (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['creator']) === null || _e === void 0 ? void 0 : _e['is_bot'],
+                                        first_name: (_g = (_f = res['result']) === null || _f === void 0 ? void 0 : _f['creator']) === null || _g === void 0 ? void 0 : _g['first_name'],
+                                        username: (_j = (_h = res['result']) === null || _h === void 0 ? void 0 : _h['creator']) === null || _j === void 0 ? void 0 : _j['username'],
+                                        last_name: (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['creator']) === null || _l === void 0 ? void 0 : _l['last_name']
+                                    },
+                                    creates_join_request: (_m = res['result']) === null || _m === void 0 ? void 0 : _m['creates_join_request'],
+                                    is_primary: (_o = res['result']) === null || _o === void 0 ? void 0 : _o['is_primary'],
+                                    is_revoked: (_p = res['result']) === null || _p === void 0 ? void 0 : _p['is_revoked'],
+                                    name: (_q = res['result']) === null || _q === void 0 ? void 0 : _q['name'],
+                                    expire_date: (_r = res['result']) === null || _r === void 0 ? void 0 : _r['expire_date'],
+                                    member_limit: (_s = res['result']) === null || _s === void 0 ? void 0 : _s['member_limit'],
+                                    pending_join_request_count: (_t = res['result']) === null || _t === void 0 ? void 0 : _t['pending_join_request_count']
+                                });
+                            }
+                            else {
+                                callback({});
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.exportInviteLink = function (chatId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("exportChatInviteLink", {
+                            chat_id: chatId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res['result']);
+                            }
+                            else {
+                                callback(undefined);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.deleteMessage = function (chatId_1, messageId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, messageId, callback) {
+            var msgids_1, _loop_1, this_1, _i, messageId_2, mid;
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(typeof messageId == "number")) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.request.makeConnection("deleteMessage", {
+                                chat_id: chatId,
+                                message_id: messageId
+                            }, function (res) {
+                                if (res.ok) {
+                                    callback(res.result);
+                                }
+                                else {
+                                    callback(false);
+                                    _this.emit("fumble", res.description, res.error_code);
+                                }
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 7];
+                    case 2:
+                        if (!Array.isArray(messageId)) return [3 /*break*/, 7];
+                        msgids_1 = {};
+                        _loop_1 = function (mid) {
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0: return [4 /*yield*/, this_1.request.makeConnection("deleteMessage", {
+                                            chat_id: chatId,
+                                            message_id: mid
+                                        }, function (res) {
+                                            if (res.ok) {
+                                                Object.defineProperty(msgids_1, mid, {
+                                                    value: res.result,
+                                                    enumerable: true,
+                                                    configurable: true,
+                                                    writable: true
+                                                });
+                                            }
+                                            else {
+                                                Object.defineProperty(msgids_1, mid, {
+                                                    value: false,
+                                                    enumerable: true,
+                                                    configurable: true,
+                                                    writable: true
+                                                });
+                                                _this.emit("fumble", res.description, res.error_code);
+                                            }
+                                        })];
+                                    case 1:
+                                        _b.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        };
+                        this_1 = this;
+                        _i = 0, messageId_2 = messageId;
+                        _a.label = 3;
+                    case 3:
+                        if (!(_i < messageId_2.length)) return [3 /*break*/, 6];
+                        mid = messageId_2[_i];
+                        return [5 /*yield**/, _loop_1(mid)];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 6:
+                        callback(msgids_1);
+                        _a.label = 7;
+                    case 7: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.createNewStickerSet = function (userId_1, name_1, title_1, sticker_1) {
+        return __awaiter(this, arguments, void 0, function (userId, name, title, sticker, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("createNewStickerSet", {
+                            user_id: userId,
+                            name: name,
+                            title: title,
+                            sticker: sticker
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.banChatMember = function (chatId_1, userId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, userId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("banChatMember", {
+                            chat_id: chatId,
+                            user_id: userId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.unbanChatMember = function (chatId_1, userId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, userId, onlyIfBanned, callback) {
+            var _this = this;
+            if (onlyIfBanned === void 0) { onlyIfBanned = true; }
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("unbanChatMember", {
+                            chat_id: chatId,
+                            user_id: userId,
+                            only_if_banned: onlyIfBanned
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
+     *
+     * @param chatId
+     * @param userId
+     * @param promotion
+     * @param callback
+     * @abstract Says chat id is empty, after fixing the servers, we will fix this method
+     */
+    BaleBot.prototype.promoteChatMember = function (chatId_1, userId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, userId, promotion, callback) {
+            var _this = this;
+            if (promotion === void 0) { promotion = {}; }
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("promoteChatMember", {
+                            chat_id: chatId,
+                            user_id: userId,
+                            can_change_info: promotion.can_change_info,
+                            can_post_messages: promotion.can_post_messages,
+                            can_edit_messages: promotion.can_edit_messages,
+                            can_delete_messages: promotion.can_delete_messages,
+                            can_manage_video_chats: promotion.can_manage_video_chats,
+                            can_invite_users: promotion.can_invite_users,
+                            can_restrict_members: promotion.can_restrict_members
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res);
+                            }
+                            else {
+                                callback(res);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
+     *
+     * @param chatId
+     * @param photo
+     * @param callback
+     * @abstract Says Internal server error, after fixing the servers, we will fix this method
+     */
+    BaleBot.prototype.setChatPhoto = function (chatId_1, photo_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, photo, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.link_url_regex.test(photo)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.request.makeConnection("setChatPhoto", {
+                                chat_id: chatId,
+                                photo: photo
+                            }, function (res) {
+                                if (res.ok) {
+                                    callback(res);
+                                }
+                                else {
+                                    callback(res);
+                                    _this.emit("fumble", res.description, res.error_code);
+                                }
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [3 /*break*/, 4];
+                    case 2:
+                        if (!(0, fs_1.existsSync)(photo)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.request.setChatPhoto(photo, chatId, function (res) {
+                                if (res.ok) {
+                                    callback(res);
+                                }
+                                else {
+                                    callback(res);
+                                    _this.emit("fumble", res.description, res.error_code);
+                                }
+                            })];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.leaveChat = function (chatId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("leaveChat", {
+                            chat_id: chatId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.setChatTitle = function (chatId_1, title_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, title, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("setChatTitle", {
+                            chat_id: chatId,
+                            title: title
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.setChatDescription = function (chatId_1, description_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, description, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("setChatDescription", {
+                            chat_id: chatId,
+                            description: description
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.deleteChatPhoto = function (chatId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("deleteChatPhoto", {
+                            chat_id: chatId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(false);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.getChatMembersCount = function (chatId_1) {
+        return __awaiter(this, arguments, void 0, function (chatId, callback) {
+            var _this = this;
+            if (callback === void 0) { callback = function (clback) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request.makeConnection("getChatMembersCount", {
+                            chat_id: chatId
+                        }, function (res) {
+                            if (res.ok) {
+                                callback(res.result);
+                            }
+                            else {
+                                callback(-1);
+                                _this.emit("fumble", res.description, res.error_code);
+                            }
+                        })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BaleBot.prototype.replyTo = function (message_1, text_1) {
+        return __awaiter(this, arguments, void 0, function (message, text, options, callback) {
+            var _, __;
+            var _this = this;
+            if (options === void 0) { options = {}; }
+            if (callback === void 0) { callback = function (message) { }; }
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _ = options.keyboard_mode;
+                        __ = {};
+                        __[_] = options.reply_markup;
+                        return [4 /*yield*/, this.request.makeConnection("sendMessage", {
+                                chat_id: message.chat.id,
+                                text: text,
+                                reply_to_message_id: message.id,
+                                reply_markup: JSON.stringify(__)
+                            }, function (res) {
+                                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+                                if (callback) {
+                                    if (res.ok) {
+                                        callback({
+                                            text: text,
+                                            from: {
+                                                id: res.result.from['id'],
+                                                is_bot: res.result.from['is_bot'],
+                                                first_name: res.result.from['first_name'],
+                                                last_name: res.result.from['last_name'],
+                                                username: res.result.from['username'],
+                                                language_code: res.result.from['language_code']
+                                            },
+                                            id: res.result['message_id'],
+                                            date: res.result['date'],
+                                            chat: {
+                                                id: res.result.chat['id'],
+                                                type: res.result.chat['type'],
+                                                photo: {
+                                                    big_file_id: (_c = (_b = (_a = res['result']) === null || _a === void 0 ? void 0 : _a['chat']) === null || _b === void 0 ? void 0 : _b['photo']) === null || _c === void 0 ? void 0 : _c['big_file_id'],
+                                                    big_file_unique_id: (_f = (_e = (_d = res['result']) === null || _d === void 0 ? void 0 : _d['chat']) === null || _e === void 0 ? void 0 : _e['photo']) === null || _f === void 0 ? void 0 : _f['big_file_unique_id'],
+                                                    small_file_id: (_j = (_h = (_g = res['result']) === null || _g === void 0 ? void 0 : _g['chat']) === null || _h === void 0 ? void 0 : _h['photo']) === null || _j === void 0 ? void 0 : _j['small_file_id'],
+                                                    small_file_unique_id: (_m = (_l = (_k = res['result']) === null || _k === void 0 ? void 0 : _k['chat']) === null || _l === void 0 ? void 0 : _l['photo']) === null || _m === void 0 ? void 0 : _m['small_file_unique_id'],
+                                                }
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        callback({ text: undefined });
+                                        _this.emit("fumble", res.description, res.error_code);
+                                    }
+                                }
+                            })];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -1402,66 +2056,4 @@ var BaleBot = /** @class */ (function (_super) {
     return BaleBot;
 }(events_1.EventEmitter));
 exports.BaleBot = BaleBot;
-// const b = new BaleBot("1541141536:UqPXqR7Lus8yI4M9QsMMFWwiVpk1W4rbTyoOiuxp", { polling: false, polling_interval: 1000});
-// b.getChat(
-//     554324725,
-//     (data) => {
-//         console.log(data)
-//     }
-// )
-// b.sendMedia(
-//     {
-//         media: "video",
-//         path: "./movie.mp4",
-//         chat_id: 554324725,
-//     },
-//     (data) => {
-//         console.log(data)
-//     }
-// )
-// b.getFileContent("1541141536:8796073695150022400:1:c40e1ca80d6f476b4c174c1f29cc90d5", (re) => {
-//     console.log(re.data)
-// })
-// b.getFile(
-//     "1541141536:6198042179158220547:1:19072fd85f4cd4b9",
-//     (data) => {
-//         console.log(data)
-//     }
-// )
-// b.sendPhoto(
-//     554324725,
-//     "I:\\ws2.png",
-//     {
-//         reply_markup: [
-//             [
-//                 {
-//                     text: "KO",
-//                     request_contact: true
-//                 }
-//             ]
-//         ]
-//     },
-//     (msg) => { console.log(msg.photo) }
-// )
-// b.sendPhoto(
-//     554324725,
-//     "https://avatars.githubusercontent.com/u/196440184?v=4",
-//     {
-//         reply_markup: [
-//             [
-//                 {
-//                     text: "KO",
-//                     request_contact: true
-//                 }
-//             ]
-//         ]
-//     },
-//     (msg) => { console.log(msg.photo) }
-// )
-// b.sendMessage(
-//     554324725,
-//     "hi",
-//     {},
-//     (c) => { console.log(c) }
-// )
-module.exports = { BaleBot: BaleBot };
+module.exports = { BaleBot: BaleBot, MaskText: interfaces_1.MaskText };

@@ -239,6 +239,11 @@ export interface SendMessageOptions {
     keyboard_mode?: keyboardTypes | undefined;
 }
 
+export interface editMessageTextOptions {
+    reply_markup?: InlineKeyboard | ReplyKeyboard | undefined;
+    keyboard_mode?: keyboardTypes | undefined;
+}
+
 export interface ConstructorOptions {
     polling_interval: number | undefined;
     polling: boolean | undefined;
@@ -290,6 +295,28 @@ export interface reWrite {
     ok: boolean;
     error_message?: string | undefined;
     data?: string | undefined;
+}
+
+export interface newInviteLink {
+    invite_link?: string | undefined;
+    creator?: User | undefined;
+    creates_join_request?: boolean | undefined;
+    is_primary?: boolean | undefined;
+    is_revoked?: boolean | undefined;
+    name?: string | undefined;
+    expire_date?: number | undefined;
+    member_limit?: number | undefined;
+    pending_join_request_count?: number | undefined;
+}
+
+export interface Promotion {
+    can_change_info?: boolean | undefined;
+    can_post_messages?: boolean | undefined;
+    can_edit_messages?: boolean | undefined;
+    can_delete_messages?: boolean | undefined;
+    can_manage_video_chats?: boolean | undefined;
+    can_invite_users?: boolean | undefined;
+    can_restrict_members?: boolean | undefined;
 }
 
 module.exports = { MaskText };

@@ -1,14 +1,17 @@
 {
-  "name": "bale-api",
+  "name": "node-bale-api",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "bale", "bale messenger",
+    "messenger", "api"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Asynchronous Bale Messenger Module",
   "dependencies": {
     "@types/axios": "^0.9.36",
     "axios": "^1.8.3",

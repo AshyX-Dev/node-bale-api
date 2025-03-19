@@ -32,7 +32,7 @@ export class Connection {
             const res = await _.json();
             callback(res);
         } catch (e) {
-            callback({ok: false, local_error: e});
+            callback({ok: false, message: e});
         }
     }
 
@@ -73,6 +73,75 @@ export class Connection {
         }
     }
 
+    async setChatPhoto(path: string, chatId: number, callback: (data: any) => void = (data) => {}){
+        try {
+            const fileStream = createReadStream(path);
+            const formData = new FormData();
+
+            formData.append("chat_id", chatId.toString());
+            formData.append("photo", fileStream, basename(path));
+            await axios.post(`https://tapi.bale.ai/bot${this.token}/setChatPhoto`, formData, {
+              headers: {
+                ...formData.getHeaders(),
+              },
+            }).then((resp) => {
+                callback(resp.data);
+            })
+        } catch (error) {
+            callback({
+                ok: false,
+                message: error
+            });
+        }
+    }
+
+    /* Beta */
+    async uploadSticker(path: string, userId: number, callback: (data: any) => void = (data) => {}){
+        try {
+            const fileStream = createReadStream(path);
+            const formData = new FormData();
+
+            formData.append("user_id", userId.toString());
+            formData.append("sticker", fileStream, basename(path));
+            await axios.post(`https://tapi.bale.ai/bot${this.token}/uploadStickerFile`, formData, {
+              headers: {
+                ...formData.getHeaders(),
+              },
+            }).then((resp) => {
+                callback(resp.data);
+            })
+        } catch (error) {
+            callback({
+                ok: false,
+                message: error
+            });
+        }
+    }
+
+    /* Beta */
+    async uploadStickerToSet(path: string, userId: number, setName: string, callback: (data: any) => void = (data) => {}){
+        try {
+            const fileStream = createReadStream(path);
+            const formData = new FormData();
+
+            formData.append("user_id", userId.toString());
+            formData.append("name", setName);
+            formData.append("sticker", fileStream, basename(path));
+            await axios.post(`https://tapi.bale.ai/bot${this.token}/addStickerToSet`, formData, {
+              headers: {
+                ...formData.getHeaders(),
+              },
+            }).then((resp) => {
+                callback(resp.data);
+            })
+        } catch (error) {
+            callback({
+                ok: false,
+                message: error
+            });
+        }
+    }
+
     async fileConnection(filePath: string, callback: (data: any) => void = (data: any) => {}){
         try{
             const url = this.file_url+filePath;
@@ -85,7 +154,7 @@ export class Connection {
             const res = await _.text();
             callback(res);
         } catch (e) {
-            callback({ok: false, local_error: e});
+            callback({ok: false, message: e});
         }
     }
 }
