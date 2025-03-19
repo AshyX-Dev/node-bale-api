@@ -1,5 +1,5 @@
 # Node Bale API
-`[Github Page is Here ! 👥🍷](https://github.com/AshyX-Dev/node-bale-api)`
+[Github Page is Here ! 👥🍷](https://github.com/AshyX-Dev/node-bale-api)
 ## Usage
 + polling: boolean => create a interval
 + polling_interval: number => a ms time to make a request
